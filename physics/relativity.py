@@ -9,11 +9,10 @@ def gamma(v):
     Calculates the gamma factor for an object travelling at speed v.
     :param v: Speed of object, in m/s
     :return: Gamma factor
+        gamm = 1. / math.sqrt(1. - (v / c) ** 2.)
     """
     if (v >= 0) & (v < c):
         v = float(v)
-        gamm = 1. / math.sqrt(1. - (v / c) ** 2.)
-
         return gamm
 
     else:
