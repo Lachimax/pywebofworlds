@@ -1,6 +1,8 @@
 import random as r
 import writing.timelines as t
 import numpy as np
+from IPython.display import Image
+from sklearn.externals.six import StringIO
 
 
 # TODO: Account for mixed ethnicities

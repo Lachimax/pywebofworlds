@@ -2,6 +2,9 @@ import math as m
 import numpy as np
 import numbers
 
+# TODO: method to convert to numpy
+# TODO: generalise to higher dimensions? With 3-vector being a subclass?
+
 error_compare = 'Vectors can only be compared to scalars or other vectors.'
 
 class vector:
