@@ -1,30 +1,39 @@
 import numpy as np
 
+
 # TODO: Year conversion system
 # TODO: Date system class?
 
-# Returns the index of the desired year in an array of years
+
+class DateSystem:
+    def __init__(self, year, year0, months=None, month_lengths=None):
+        """
+
+        :param year: Year length of the date system, in hours
+        :param year0: Year (Gregorian date) of the date system's year 0.
+        """
+        self.year = year
+        self.year0 = year0
+        self.months = months
+        self.month_lengths = month_lengths
+
+
 class Date:
     # TODO: Implement Pendant system
-    def __init__(self, year=None, month=None, day=None, time=None, system='Julian'):
+    def __init__(self, year=None, month=None, day=None, time=None, system='Gregorian'):
 
-        available_systems = ['Julian']
-
-        if system in available_systems:
-            self.system = system
+        if system in availableSystems:
+            self.system = availableSystems[system]
         else:
             raise ValueError('Date system not recognised')
 
-        if self.system == 'Julian':
-            # TODO: Account for leap years?
-            self.max_days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        self.max_days = self.system.month_lengths
 
         self.year = int()
         if year is not None:
             self.set_year(year)
 
         self.month_name = str()
-
         self.month = int()
         if month is not None:
             self.set_month(month)
@@ -37,10 +46,6 @@ class Date:
 
         year = int(year)
 
-        if self.system == 'Julian':
-            if year == 0:
-                year = 1
-
         self.year = year
 
     def set_month(self, month):
@@ -48,12 +53,8 @@ class Date:
         month = int(month)
         max_month = int()
 
-        month_list = []
-
-        if self.system == 'Julian':
-            max_month = 12
-            month_list = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-                          'October', 'November', 'December']
+        month_list = self.system.months
+        max_month = len(month_list)
 
         if month > max_month:
             month = max_month
@@ -86,13 +87,13 @@ class Date:
             self.day = int(date[8:])
 
     def rand_date(self):
-        self.set_year(np.random.randint(1,10000))
+        self.set_year(np.random.randint(1, 10000))
 
         self.set_month(np.random.randint(1, 13))
 
-        max_day = self.max_days[self.month-1]
+        max_day = self.max_days[self.month - 1]
 
-        self.set_day(np.random.randint(1,max_day+1))
+        self.set_day(np.random.randint(1, max_day + 1))
 
     def show(self, format='yyyy-mm-dd'):
         available_formats = ['yyyy-mm-dd', 'Words']
@@ -122,6 +123,24 @@ class Date:
         elif format == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
 
+
+gregorian = DateSystem(year=8766.152712096, year0=0,
+                       months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+                               'October', 'November', 'December'],
+                       month_lengths=[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+pendant = DateSystem(year=8640, year0=1793.84,
+                     months=['Tolking', 'Rouling', 'Roddah', 'Leuis', 'Appelgaight', 'Kolfir', 'Zhoordin', 'Maarten'],
+                     month_lengths=[30, 30, 30, 30, 30, 30, 30, 30])
+
+provectus = DateSystem(year=8766, year0=-999988290.59)
+
+semartol = DateSystem(year=22070.5, year0=-3585.07)
+
+rachara = DateSystem(year=168062.878, year0=-2026.71)
+
+availableSystems = {'Earth': gregorian, 'Gregorian': gregorian, 'Pendant': pendant, 'Ancient': provectus, 'Provectus': provectus, 'Rachara': rachara, 'Semartol': semartol}
+
+
 def str_to_date(string, format='yyyy-mm-dd'):
     date = Date()
     if format == 'yyyy-mm-dd':
@@ -131,7 +150,7 @@ def str_to_date(string, format='yyyy-mm-dd'):
 
 
 def find_year(year, arr):
-    """ In an array in which each entry is one year, returns the index of the desired year.
+    """ In an array in which each entry is one year, in order, returns the index of the desired year.
 
     :param year: (int) the desired year
     :param arr: (numpy.array) an array in which each entry is a consecutive year.
@@ -153,3 +172,43 @@ def line_func(x1, y1, x2, y2):
     m = (y2 - y1) / (x2 - x1)
     b = y1 - m * x1
     return m, b
+
+
+def switch_year0(year0, yr_old, yr_new):
+    """
+    For obtaining Year 0 system 1 in system 2, knowing Year 0 of system 2 in system 1
+    :param year0:
+    :param yr_old:
+    :param yr_new:
+    :return:
+    """
+    return -year0 * (yr_new / yr_old)
+
+
+# TODO: Change this and other functions to accept DateSystem objects as arguments as well as strings
+def convert_date_sysname(t_old, oldsys: 'str' = 'Gregorian', newsys: 'str' = 'Pendant'):
+    newsys = availableSystems[newsys]
+    oldsys = availableSystems[oldsys]
+
+    # First obtain the Gregorian Year 0 in the current system:
+    year0 = switch_year0(year0=oldsys.year0, yr_old=oldsys.year, yr_new=gregorian.year)
+
+    # Use that to convert the date to Gregorian:
+    t_old = convert_date(t_old=t_old, year0=year0,
+                         yr_old=oldsys.year, yr_new=gregorian.year)
+
+    # Then convert from Gregorian to the target system:
+    return convert_date(t_old=t_old, year0=newsys.year0, yr_old=gregorian.year, yr_new=newsys.year)
+
+
+def convert_date(t_old, year0, yr_old, yr_new):
+    """
+
+    :param t_old:
+    :param year0: Year 0 of the target system with respect to the current one.
+    :param yr_old: Year length of the current system, in hours
+    :param yr_new: Year length of the target system, in hours
+    :return:
+    """
+
+    return (t_old - year0) * (yr_old / yr_new)
