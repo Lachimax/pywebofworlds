@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 # TODO: General function for querying ephemeris
 # TODO: Allow query to accept names, which it turns into the relevant numbers
 # TODO: Generalise query to retrieve more properties
+# TODO: Subtract Sun's coordinates to make heliocentric
+# TODO: Function to show current distance from Earth to given body
 
 
 def query(objects, date_start=None, date_end=None, resolution='1d'):
@@ -187,5 +189,3 @@ def overhead():
     plt.show()
 
     return xxx, yyy, zzz
-
-overhead()

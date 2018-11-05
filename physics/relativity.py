@@ -6,14 +6,14 @@ c = u.c
 
 def gamma(v):
     """
-    Calculates the gamma factor for an object travelling at speed v.
+    Calculates the gamma (Lorentz) factor for an object travelling at speed v.
     :param v: Speed of object, in m/s
     :return: Gamma factor
         gamm = 1. / math.sqrt(1. - (v / c) ** 2.)
     """
     if (v >= 0) & (v < c):
         v = float(v)
-        return gamm
+        return (math.sqrt(1-(v/c)**2))**-1
 
     else:
         raise ValueError('v must be less than the speed of light')

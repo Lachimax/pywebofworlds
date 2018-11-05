@@ -34,11 +34,13 @@ from mpl_toolkits.mplot3d import Axes3D
 # TODO: generate solar system
 # TODO: Titius-Bode Law
 
+# TODO: Example scripts
 # TODO: Method for reading in exoplanet catalogue. Try to match names, alternate names, then ra & dec
 
 class StarList:
     """
-    A StarList is an object containing a list of StarSystems, Stars, Planets and Moons.
+    A StarList is an object containing a list of StarSystems, Stars, Planets and Moons, with methods for doing things
+    with them.
     """
 
     def __init__(self):
@@ -193,7 +195,8 @@ class StarList:
             return moon
 
     def furthest_star(self):
-        """
+        # TODO: Add ability to specify point to measure distance from, with 0,0,0 as default
+		"""
         :return: StarSystem in the list with the greatest distance (from origin)
         """
         maxim = 0.

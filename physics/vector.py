@@ -1,16 +1,18 @@
 import math as m
-import numpy as np
+# import numpy as np
 import numbers
 
 # TODO: method to convert to numpy
-# TODO: generalise to higher dimensions? With 3-vector being a subclass?
+# TODO: generalise to higher dimensions? With 3-Vector being a subclass?
 
 error_compare = 'Vectors can only be compared to scalars or other vectors.'
 
-class vector:
+
+class Vector:
     """
-    This class is an object for manipulating vectors in three dimensions
+    This class is an object for manipulating vectors in three dimensions.
     """
+
     def __init__(self, x=0., y=0., z=0.):
         self.x = float(x)
         self.y = float(y)
@@ -29,15 +31,15 @@ class vector:
             raise IndexError('Vectors have three entries only.')
 
     def modulus(self):
-        return m.sqrt(self.x**2 + self.y**2 + self.z**2)
+        return m.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
 
     def unit(self):
-        return vector(x=self.x/self.magnitude, y=self.y/self.magnitude,  z=self.z/self.magnitude)
+        return Vector(x=self.x / self.magnitude, y=self.y / self.magnitude, z=self.z / self.magnitude)
 
     def __lt__(self, other):
         if isinstance(other, numbers.Number):
             return self.magnitude < other
-        elif isinstance(other, vector):
+        elif isinstance(other, Vector):
             return self.magnitude < other.magnitude
         else:
             raise TypeError(error_compare)
@@ -45,7 +47,7 @@ class vector:
     def __le__(self, other):
         if isinstance(other, numbers.Number):
             return self.magnitude <= other
-        elif isinstance(other, vector):
+        elif isinstance(other, Vector):
             return self.magnitude <= other.magnitude
         else:
             raise TypeError(error_compare)
@@ -53,7 +55,7 @@ class vector:
     def __eq__(self, other):
         if isinstance(other, numbers.Number):
             return self.magnitude == other
-        elif isinstance(other,vector):
+        elif isinstance(other, Vector):
             return self.x == other.x and self.y == other.y and self.z == other.z
         else:
             raise TypeError(error_compare)
@@ -61,7 +63,7 @@ class vector:
     def __ge__(self, other):
         if isinstance(other, numbers.Number):
             return self.magnitude >= other
-        elif isinstance(other, vector):
+        elif isinstance(other, Vector):
             return self.magnitude >= other.magnitude
         else:
             raise TypeError(error_compare)
@@ -69,26 +71,26 @@ class vector:
     def __gt__(self, other):
         if isinstance(other, numbers.Number):
             return self.magnitude > other
-        elif isinstance(other, vector):
+        elif isinstance(other, Vector):
             return self.magnitude > other.magnitude
         else:
             raise TypeError(error_compare)
 
     def __add__(self, other):
-        return vector(self.x + other.x, self.y + other.y, self.z + other.z)
+        return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
 
     def __sub__(self, other):
-        return vector(self.x - other.x, self.y - other.y, self.z - other.z)
+        return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __mul__(self, other):
         if isinstance(other, numbers.Number):
-            return vector(other*self.x, other*self.y, other*self.z)
-        elif isinstance(other, vector):
+            return Vector(other * self.x, other * self.y, other * self.z)
+        elif isinstance(other, Vector):
             return ValueError('Multiplication of two vectors is undefined - try dot() or cross() instead.')
 
     def __truediv__(self, other):
         if isinstance(other, numbers.Number):
-            return vector(x=self.x/other, y=self.y/other, z=self.z/other)
+            return Vector(x=self.x / other, y=self.y / other, z=self.z / other)
         else:
             raise ValueError('Division of two vectors is undefined.')
 
@@ -96,10 +98,10 @@ class vector:
         return self.magnitude
 
     def __invert__(self):
-        return vector(x=1./self.x, y=1./self.y, z=1./self.z)
+        return Vector(x=1. / self.x, y=1. / self.y, z=1. / self.z)
 
     def __repr__(self):
-        return 'physics.vector.vector(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
+        return 'physics.Vector.Vector(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
 
     def __str__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
@@ -122,4 +124,3 @@ class vector:
     def __len__(self):
         # Note: Rewrite if you generalise to higher-order vectors
         return 3
-

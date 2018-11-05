@@ -1,10 +1,6 @@
 import numpy as np
 
 
-# TODO: Year conversion system
-# TODO: Date system class?
-
-
 class DateSystem:
     def __init__(self, year, year0, months=None, month_lengths=None):
         """
@@ -17,9 +13,8 @@ class DateSystem:
         self.months = months
         self.month_lengths = month_lengths
 
-
+# TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
 class Date:
-    # TODO: Implement Pendant system
     def __init__(self, year=None, month=None, day=None, time=None, system='Gregorian'):
 
         if system in availableSystems:
@@ -123,22 +118,22 @@ class Date:
         elif format == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
 
-
+# Date systems in my universe:
 gregorian = DateSystem(year=8766.152712096, year0=0,
                        months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
                                'October', 'November', 'December'],
                        month_lengths=[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+
+# conjugus = DateSystem(year=21343.3036, year0=)
 pendant = DateSystem(year=8640, year0=1793.84,
                      months=['Tolking', 'Rouling', 'Roddah', 'Leuis', 'Appelgaight', 'Kolfir', 'Zhoordin', 'Maarten'],
                      month_lengths=[30, 30, 30, 30, 30, 30, 30, 30])
-
 provectus = DateSystem(year=8766, year0=-999988290.59)
-
+rachara = DateSystem(year=168062.878, year0=-2026.71)
 semartol = DateSystem(year=22070.5, year0=-3585.07)
 
-rachara = DateSystem(year=168062.878, year0=-2026.71)
-
-availableSystems = {'Earth': gregorian, 'Gregorian': gregorian, 'Pendant': pendant, 'Ancient': provectus, 'Provectus': provectus, 'Rachara': rachara, 'Semartol': semartol}
+availableSystems = {'Earth': gregorian, 'Gregorian': gregorian, 'Pendant': pendant, 'Ancient': provectus,
+                    'Provectus': provectus, 'Rachara': rachara, 'Semartol': semartol}
 
 
 def str_to_date(string, format='yyyy-mm-dd'):
@@ -185,20 +180,20 @@ def switch_year0(year0, yr_old, yr_new):
     return -year0 * (yr_new / yr_old)
 
 
-# TODO: Change this and other functions to accept DateSystem objects as arguments as well as strings
-def convert_date_sysname(t_old, oldsys: 'str' = 'Gregorian', newsys: 'str' = 'Pendant'):
-    newsys = availableSystems[newsys]
-    oldsys = availableSystems[oldsys]
+# TODO: Change this and other functions to accept DateSystem objects for old_sys and new_sys, as well as strings
+def convert_date_sys(t_old, old_sys: 'str' = 'Gregorian', new_sys: 'str' = 'Pendant'):
+    new_sys = availableSystems[new_sys]
+    old_sys = availableSystems[old_sys]
 
     # First obtain the Gregorian Year 0 in the current system:
-    year0 = switch_year0(year0=oldsys.year0, yr_old=oldsys.year, yr_new=gregorian.year)
+    year0 = switch_year0(year0=old_sys.year0, yr_old=old_sys.year, yr_new=gregorian.year)
 
     # Use that to convert the date to Gregorian:
     t_old = convert_date(t_old=t_old, year0=year0,
-                         yr_old=oldsys.year, yr_new=gregorian.year)
+                         yr_old=old_sys.year, yr_new=gregorian.year)
 
     # Then convert from Gregorian to the target system:
-    return convert_date(t_old=t_old, year0=newsys.year0, yr_old=gregorian.year, yr_new=newsys.year)
+    return convert_date(t_old=t_old, year0=new_sys.year0, yr_old=gregorian.year, yr_new=new_sys.year)
 
 
 def convert_date(t_old, year0, yr_old, yr_new):

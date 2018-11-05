@@ -8,6 +8,7 @@ from sklearn.tree import export_graphviz
 # TODO: Account for mixed ethnicities
 # TODO: Choose and implement sexuality model
 # TODO: gender model
+# TODO: Automatic rebalance of random generation depending on in-use characters.
 
 # TODO: Maybe implement a class for location, incorporating date systems, demographics etc.
 

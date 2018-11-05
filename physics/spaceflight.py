@@ -13,8 +13,6 @@ c = u.c
 # TODO: For wormhole networks, implement increasing speeds
 # TODO: Select stars along line? - directed creep, select closest star to point in sky
 
-# Under constant acceleration g
-
 
 def distance_travelled(t, g=10., v0=0.):
     """
@@ -85,7 +83,20 @@ def proper_time(t, g=10.):
 
 
 class Voyage:
-    def __init__(self, star1, star2, m, g=10, g_time=0.5):
+    """
+    A class intended to represent a single star-to-star journey by a spacecraft that accelerates constantly first,
+    coasts for some time after, and then decelerates at the same rate as the initial acceleration the rest of the way.
+    """
+
+    def __init__(self, star1: 'a.Star', star2: 'a.Star', mass: 'float', g: 'float' = 10, g_time: 'float' = 0.5):
+        """
+
+        :param star1: A physics.astrophysics.star object, the spacecraft's origin.
+        :param star2: A physics.astrophysics.star object, the spacecraft's destination.
+        :param mass:
+        :param g:
+        :param g_time:
+        """
         if type(star1) is a.Star:
             self.origin = star1
         else:
@@ -110,7 +121,7 @@ class Voyage:
         self.tau_coast = r.time_dilation(self.t_coast, self.v_coast)
         self.tau = self.proper_time()
 
-        self.K = r.kinetic_energy(m, self.v_coast)
+        self.K = r.kinetic_energy(mass, self.v_coast)
         self.fuel_mass = 2 * r.energy_mass(self.K)
 
     def coord_time(self):
@@ -125,11 +136,17 @@ class Voyage:
 
 
 class Odyssey:
-    def __init__(self):
-        self.voyage_list = list()
+    """
+    Intended to represent a chain of Voyages, from star to star.
+    """
 
-    def add_voyage(self, voy):
-        if type(voy) == Voyage:
+    def __init__(self, voyage_list: "list" = None):
+        self.voyage_list = []
+        if voyage_list is not None:
+            self.voyage_list = voyage_list
+
+    def add_voyage(self, voy: "Voyage"):
+        if type(voy) is Voyage:
             self.voyage_list.append(voy)
 
     def coord_time(self):
@@ -282,71 +299,28 @@ class WormholeGraph:
 
         self.starList.reset_visits()
 
-    def bf_creep(self, num=100, degree=5, speed=0.5):
-        q = Queue(num + degree)
-
-        sl = self.starList
-
-        s = self.starList[0]
-        whv = WormholeVertex(s, 0)
-
-        while self.size < num:
-
-            i = 0
-            while i < degree:
-                if q.empty():
-                    print("Queue is empty")
-                elif q.full():
-                    print("Queue is full")
-
-                # Look for a neighbour of the system that has not been visited
-                ssn = sl.find_unvisited_neighbour(s)[0]
-                if ssn is None:
-                    break
-                catch = self.check_for_vertex(ssn)
-                ssn.visited = True
-
-                whn = catch[0]
-                add = not catch[1]
-
-                dt = s.distance_to(ssn) / speed
-
-                new_time = whv.time + dt
-
-                if whn.time < new_time:
-                    whn.time = new_time
-
-                whv.add_wormhole(whn)
-                if add and q.not_full:
-                    q.put(whn)
-
-                i += 1
-
-            # sl.reset_visits()
-
-            # Pull from queue
-            if not q.empty():
-                whv = q.get()
-                s = whv.star_system
-            else:
-                break
-
-        sl.reset_visits()
-
-    def bf_creep_plus(self, num=100, degree=5,
-                      speed=lambda t: 0.1 * math.exp(0.0016 * t) / math.sqrt(
+    def bf_creep(self, num=100, degree=5,
+                 speed=lambda t: 0.1 * math.exp(0.0016 * t) / math.sqrt(
                           1 + (0.1 * math.exp(0.0016 * t)) ** 2),
-                      wait=lambda t: abs(np.random.normal(loc=100 * math.exp(-0.005 * t), scale=50)),
-                      plot=False, start_date=0., end_date=None):
+                 wait=lambda t: abs(np.random.normal(loc=100 * math.exp(-0.005 * t), scale=50)),
+                 plot=False, start_date=0., end_date=None):
         """
+        Attempts to model the spread of an interstellar wormhole-capable civilization, using Verse 12 rules and a
+        breadth-first algorithm for finding nearby stars.
         When generating its wormholes, each vertex must create a connection to at least one unvisited system; but it
         may also create connections to visited systems.
         :param num:
         :param degree:
         :param speed: A function that decides how fast a wormhole probe can travel, as a function of time - to represent
-        technological development. This decides how long it takes for a new wormhole to appear in a nearby system.
+        technological development. This decides how long it takes for a new wormhole to appear in a nearby system. This
+        should, in effect, give the average speed of the probe over its journey.
         :param wait: A function that decides how long it should be between probe launches from a star, as a function of
         time (again, technological development).
+        :param plot: If True, plots the resulting wormhole network using pyplot. Warning: large networks can take a lot
+        longer to plot than to model in the first place.
+        :param start_date: the year in which the first wormhole probe is launched; ie, the start of the civilization's
+        spread. Defaults to 0.
+        :param end_date: The cut-off date for the end of the model.
         :return:
         """
 
@@ -405,7 +379,7 @@ class WormholeGraph:
 
             ssn = sl.find_unvisited_neighbour(s)[0]
             dt = s.distance_to(ssn) / speed(whv.time + waits[i]) + waits[len(waits) - 1]
-            # ssn is None = There are no unvisited systems. Should not happen in bf_creep_plus
+            # ssn is None = There are no unvisited systems. Should not happen in bf_creep
             if ssn is None:
                 break
             catch = self.check_for_vertex(ssn, whv.time + dt)
@@ -431,7 +405,7 @@ class WormholeGraph:
             if plot:
                 mp = plt.figure()
 
-                self.plot_wormholes(mp, all_stars=False, bl=False, colour="red")
+                self.plot_wormholes(mp, all_stars=False, line=False, colour="red")
                 filename = str(self.size) + "bf\\_wormholes_" + str(whv.star.name + ".png")
                 mp.savefig(filename)
 
@@ -480,7 +454,6 @@ class WormholeGraph:
                         whv.add_wormhole(self.vertex_list[-1])
                     self.add_vertex(whv)
 
-
     def write_wormholes_to(self):
         print("Writing wormholes to StarList")
         for wh in self:
@@ -522,13 +495,14 @@ class WormholeGraph:
 
         return self.add_vertex(WormholeVertex(star, time, self.empire)), False
 
-    def plot_wormholes(self, mp=plt.figure(), all_stars=False, bl=False, colour="red", suppress=True):
+    def plot_wormholes(self, mp=plt.figure(), all_stars=False, line=False, colour="red", suppress=True):
         """
-
+        Uses pyplot to produce a 3D plot of the wormhole network. Caution - large networks take a long time to plot.
         :param mp: The pyplot figure to be adapted.
         :param all_stars:
-        :param bl:
-        :param colour:
+        :param line: If True, plots black lines representing wormhole connections between vertices.
+        :param colour: The Colour of the wormhole vertices to be plotted.
+        :param suppress: If True, prevents the plot from being shown; useful if you want to plot several things at once.
         :return:
         """
         ax = mp.add_subplot(111, projection='3d')
@@ -540,7 +514,7 @@ class WormholeGraph:
 
                 ax.scatter(xs=s.x, ys=s.y, zs=s.z, c="black", s=2)
 
-                if bl:
+                if line:
                     ax.plot(xs=[s.x, s.x], ys=[s.y, s.y], zs=[s.z, 0], c='black')
                     ax.plot(xs=[s.x, 0], ys=[s.y, 0], zs=[0, 0], c='black')
 
@@ -551,7 +525,7 @@ class WormholeGraph:
 
             ax.scatter(xs=s.x, ys=s.y, zs=s.z, c=colour, s=4)
 
-            if bl:
+            if line:
                 ax.plot(xs=[s.x, s.x], ys=[s.y, s.y], zs=[s.z, 0], c='black')
                 ax.plot(xs=[s.x, 0], ys=[s.y, 0], zs=[0, 0], c='black')
 
@@ -615,23 +589,6 @@ class WormholeVertex:
             self.wormholes.append(vertex)
             vertex.wormholes.append(self)
 
-
-            # def add_edge(self, vertex):
-            #     if type(vertex) is WormholeVertex:
-            #         edge = WormholeEdge(self, vertex)
-            #         self.wormholes.append(edge)
-            #     else:
-            #         raise ValueError("Vertex must be of type WormholeVertex")
-
-
-# class WormholeEdge:
-#     def __init__(self, v1, v2):
-#         if type(v1) is WormholeVertex and type(v2) is WormholeVertex:
-#             self.vertex_1 = v1
-#             self.vertex_2 = v2
-#
-#         else:
-#             raise ValueError("Both v1 and v2 must be of type WormholeVertex")
 
 def plot_networks(networks, all_stars=False, bl=False):
     mp = plt.figure()
