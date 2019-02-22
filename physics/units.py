@@ -75,9 +75,9 @@ def acceleration_from_m_s_2(acc: "float", units="g"):
 
 
 def acceleration_to_acceleration(acc: "float", frm: "str", to: "str"):
-    if frm not in angle_units:
+    if frm not in acceleration_units:
         raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in angle_units:
+    if to not in acceleration_units:
         raise ValueError(to + ' is an unrecognised unit.')
 
     acc = acceleration_to_m_s_2(acc, frm)
