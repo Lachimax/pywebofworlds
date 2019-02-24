@@ -44,16 +44,6 @@
               <caret line="13" column="7" lean-forward="false" selection-start-line="13" selection-start-column="7" selection-end-line="13" selection-end-column="7" />
               <folding>
                 <marker date="1550793920177" expanded="false" signature="0:7" ph="import ..." />
-                <marker date="1550793920177" expanded="true" signature="62:440" ph="..." />
-                <marker date="1550793920177" expanded="true" signature="67:271" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-                <marker date="1550793920177" expanded="true" signature="298:362" ph="..." />
-                <marker date="1550793920177" expanded="true" signature="468:730" ph="..." />
-                <marker date="1550793920177" expanded="true" signature="473:636" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-                <marker date="1550793920177" expanded="true" signature="752:933" ph="..." />
-                <marker date="1550793920177" expanded="true" signature="757:884" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-                <marker date="1550793920177" expanded="true" signature="955:1071" ph="..." />
-                <marker date="1550793920177" expanded="true" signature="960:1038" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-                <marker date="1550793920177" expanded="true" signature="1103:1265" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
               </folding>
             </state>
           </provider>
@@ -62,8 +52,8 @@
       <file leaf-file-name="timelines.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/writing/timelines.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="186" column="0" lean-forward="true" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
+            <state relative-caret-position="6138">
+              <caret line="186" column="0" lean-forward="false" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -72,8 +62,8 @@
       <file leaf-file-name="units.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/physics/units.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="421">
-              <caret line="81" column="0" lean-forward="true" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+            <state relative-caret-position="66">
+              <caret line="2" column="116" lean-forward="false" selection-start-line="2" selection-start-column="116" selection-end-line="2" selection-end-column="116" />
               <folding />
             </state>
           </provider>
@@ -124,7 +114,7 @@
       <file leaf-file-name="vector.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/physics/vector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
+            <state relative-caret-position="594">
               <caret line="18" column="25" lean-forward="false" selection-start-line="18" selection-start-column="25" selection-end-line="18" selection-end-column="25" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
@@ -468,7 +458,7 @@
     <frame x="-13" y="67" width="3226" height="1746" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.132763" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13244614" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294036" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -587,16 +577,6 @@
           <caret line="11" column="12" lean-forward="false" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
           <folding>
             <marker date="1550793920177" expanded="false" signature="0:7" ph="import ..." />
-            <marker date="1550793920177" expanded="true" signature="62:440" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="67:271" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="298:362" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="468:730" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="473:636" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="752:933" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="757:884" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="955:1071" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="960:1038" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="1103:1265" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -642,16 +622,6 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <marker date="1550793920177" expanded="false" signature="0:7" ph="import ..." />
-            <marker date="1550793920177" expanded="true" signature="62:440" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="67:271" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="298:362" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="468:730" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="473:636" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="752:933" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="757:884" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="955:1071" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="960:1038" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="1103:1265" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -718,16 +688,6 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <marker date="1550793920177" expanded="false" signature="0:7" ph="import ..." />
-            <marker date="1550793920177" expanded="true" signature="62:440" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="67:271" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="298:362" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="468:730" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="473:636" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="752:933" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="757:884" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="955:1071" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="960:1038" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="1103:1265" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -841,7 +801,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/physics/vector.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
+        <state relative-caret-position="594">
           <caret line="18" column="25" lean-forward="false" selection-start-line="18" selection-start-column="25" selection-end-line="18" selection-end-column="25" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
@@ -871,16 +831,6 @@
           <caret line="13" column="7" lean-forward="false" selection-start-line="13" selection-start-column="7" selection-end-line="13" selection-end-column="7" />
           <folding>
             <marker date="1550793920177" expanded="false" signature="0:7" ph="import ..." />
-            <marker date="1550793920177" expanded="true" signature="62:440" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="67:271" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="298:362" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="468:730" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="473:636" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="752:933" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="757:884" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="955:1071" ph="..." />
-            <marker date="1550793920177" expanded="true" signature="960:1038" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
-            <marker date="1550793920177" expanded="true" signature="1103:1265" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -921,16 +871,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/writing/timelines.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="186" column="0" lean-forward="true" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
+        <state relative-caret-position="6138">
+          <caret line="186" column="0" lean-forward="false" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/physics/units.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="81" column="0" lean-forward="true" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+        <state relative-caret-position="66">
+          <caret line="2" column="116" lean-forward="false" selection-start-line="2" selection-start-column="116" selection-end-line="2" selection-end-column="116" />
           <folding />
         </state>
       </provider>
