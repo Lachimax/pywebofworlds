@@ -13,6 +13,7 @@ class DateSystem:
         self.months = months
         self.month_lengths = month_lengths
 
+
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
 class Date:
     def __init__(self, year=None, month=None, day=None, time=None, system='Gregorian'):
@@ -117,6 +118,7 @@ class Date:
 
         elif format == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
+
 
 # Date systems in my universe:
 gregorian = DateSystem(year=8766.152712096, year0=0,

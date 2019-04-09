@@ -1,6 +1,7 @@
 import math
 
-# TODO: Allow entry of raw number into 'units' argument of each function, ie allow custom units as multiples of the base unit
+# TODO: Allow entry of raw number into 'units' argument of each function, ie allow custom units as multiples of the
+# base unit
 
 pi = math.pi
 
