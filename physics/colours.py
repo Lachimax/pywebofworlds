@@ -1,41 +1,39 @@
 import numpy as np
 
 
-def wavelengthToRGB(wavelength):
-    l = wavelength
-
+def wavelength_to_rgb(wavelength):
     factor = 0.
 
     r = 0.
     g = 0.
     b = 0.
 
-    if (l >= 380 and l < 440):
-        r = -(l - 440.) / (440. - 380.)
+    if 440 > wavelength >= 380:
+        r = -(wavelength - 440.) / (440. - 380.)
         g = 0.
         b = 1.0
 
-    elif (l >= 440 and l < 490):
+    elif 490 > wavelength >= 440:
         r = 0.
-        g = (l - 440.) / (490. - 440.)
+        g = (wavelength - 440.) / (490. - 440.)
         b = 1.
 
-    elif (l >= 490 and l < 510):
+    elif 510 > wavelength >= 490:
         r = 0.0
         g = 1.0
-        b = -(l - 510) / (510 - 490)
+        b = -(wavelength - 510) / (510 - 490)
 
-    elif (l >= 510 and l < 580):
-        r = (l - 510) / (580 - 510)
+    elif 580 > wavelength >= 510:
+        r = (wavelength - 510) / (580 - 510)
         g = 1.0
         b = 0.0
 
-    elif (l >= 580 and l < 645):
+    elif 640 > wavelength >= 580:
         r = 1.0
-        g = -(l - 645) / (645 - 580)
+        g = -(wavelength - 645) / (645 - 580)
         b = 0.0
 
-    elif (l >= 645 and l < 781):
+    elif 781 > wavelength >= 645:
         r = 1.0
         g = 0.0
         b = 0.0
@@ -47,17 +45,16 @@ def wavelengthToRGB(wavelength):
 
     # Let the intensity fall off near the vision limits
 
+    if 420 > wavelength >= 380:
 
-    if (l >= 380 and l < 420):
+        factor = 0.3 + 0.7 * (wavelength - 380) / (420 - 380)
 
-        factor = 0.3 + 0.7 * (l - 380) / (420 - 380)
-
-    elif (l >= 420 and l < 701):
+    elif 701 > wavelength >= 420:
 
         factor = 1.0
 
-    elif (l >= 701 and l < 781):
-        factor = 0.3 + 0.7 * (780 - l) / (780 - 700)
+    elif 781 > wavelength >= 701:
+        factor = 0.3 + 0.7 * (780 - wavelength) / (780 - 700)
 
     else:
         factor = 0.0
