@@ -195,10 +195,11 @@ class StarList:
             return moon
 
     def furthest_star(self):
-        # TODO: Add ability to specify point to measure distance from, with 0,0,0 as default
-		"""
+        """
         :return: StarSystem in the list with the greatest distance (from origin)
         """
+        # TODO: Add ability to specify point to measure distance from, with 0,0,0 as default
+
         maxim = 0.
         furthest = None
         for s in self.star_list:
@@ -1179,8 +1180,6 @@ class StarList:
         for star in other:
             star.match_star(self)
 
-
-
     def write_systems_xl(self, path: "str" = "SF_Cat_StarSystems"):
         """
         :param path: Name to which you wish to save the file.
@@ -2034,13 +2033,12 @@ class Star:
 
     def match_star(self, list: "StarList", tolerance=0.05):
         for star in list:
-            delta_asc = abs(star.asc-self.asc)
+            delta_asc = abs(star.asc - self.asc)
             if delta_asc < tolerance:
-                delta_dec = abs(star.dec-self.dec)
+                delta_dec = abs(star.dec - self.dec)
                 if delta_dec < tolerance:
                     # TODO: INCOMPLETE
                     a = 3
-
 
 
 class Planet:
@@ -2076,7 +2074,7 @@ class Planet:
         self.rot_period: "float" = None
         self.sma: "float" = None  # Semi-major axis, in AU
         self.eccentricity: "float" = None
-        self.inclination: "float" = None # Orbital inclination, in degrees
+        self.inclination: "float" = None  # Orbital inclination, in degrees
         self.omega: "float" = None  # Argument of periastron, in degrees
         self.semi_amplitude: "float" = None  # Semi-amplitude (I don't know what this means either)
 
@@ -2122,7 +2120,6 @@ class Planet:
 
     # def populate_moons(self, n):
     #     for i in range(n):
-
 
     def show(self):
 
@@ -2263,6 +2260,12 @@ def pdmf(mass):
 
 
 def imf_pdmf(mn, mx):
+    """
+    Returns the entire IMF and PDMF as two arrays.
+    :param mn:
+    :param mx:
+    :return:
+    """
     mass = np.arange(mn, mx, step=0.001, dtype=float)
     imf_arr = np.zeros(mass.size)
     pdmf_arr = np.zeros(mass.size)
