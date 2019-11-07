@@ -18,9 +18,10 @@ def plot_globe(file, centre_lat=0, centre_lon=0, show=True):
     return bmap
 
 
-def plot_map(file, show=True, projection='cyl'):
-    bmap = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90, \
-                   llcrnrlon=-180, urcrnrlon=180, resolution='c')
+def plot_map(file, centre_lat=0, centre_lon=0, show=True, projection='cyl'):
+    bmap = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90,
+                   llcrnrlon=-180, urcrnrlon=180, resolution='c',
+                   lat_0=centre_lat, lon_0=centre_lon)
     bmap.warpimage(image=file)
     bmap.drawmeridians(np.arange(0, 360, 30))
     bmap.drawparallels(np.arange(-90, 90, 30))
@@ -64,7 +65,8 @@ class Map:
             location = Location(name=loc['name'], lon=loc['longitude'], lat=loc['latitude'], typ=loc['type'])
             self.locations[loc['type']].append(location)
 
-    def plot_locations(self, types: Union[list, str] = None, centre_lat=0, centre_lon=0, projection='ortho'):
+    def plot_locations(self, types: Union[list, str] = None, centre_lat=0, centre_lon=0, projection='ortho',
+                       fontsize=10):
         if type(types) is str:
             types = [types]
         elif types is None:
@@ -73,10 +75,11 @@ class Map:
         if projection == 'ortho':
             bmap = plot_globe(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False)
         else:
-            bmap = plot_map(file=self.image, show=False, projection=projection)
+            bmap = plot_map(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False,
+                            projection=projection)
 
         for i, typ in enumerate(types):
             for loc in self.locations[typ]:
                 bmap.plot(loc.lon, loc.lat, f'{marker_colours[i]}o', latlon=True)
-                plt.text(loc.lon, loc.lat, loc.name, c=marker_colours[i], fontsize=8)
+                plt.text(loc.lon, loc.lat, loc.name, c=marker_colours[i], fontsize=fontsize)
         plt.show()
