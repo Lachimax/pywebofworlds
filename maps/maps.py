@@ -35,14 +35,14 @@ def plot_map(file, centre_lat=0, centre_lon=0, show=True, projection='cyl'):
 
 def great_circle_ang_dist(lon1: float, lat1: float, lon2: float, lat2: float, deg: bool = True):
     """
-    Calculates the great circle angular distance between two points on the map. All units are interpreted as degrees
-    unless deg is given as False, in which case all units are intepreted as radians.
+    Calculates the great circle angular distance between two points on the map, in degrees. All units are interpreted as
+    degrees unless deg is given as False, in which case all units are interpreted as radians.
     Constructed using https://en.wikipedia.org/wiki/Great-circle_distance
     :param lon1: Longitude of first point.
     :param lat1: Latitude of first point.
     :param lon2: Longitude of second point.
     :param lat2: Latitude of second points.
-    :param deg:
+    :param deg: Interpret units as degrees? If False, interprets as radians.
     :return:
     """
 
@@ -54,9 +54,24 @@ def great_circle_ang_dist(lon1: float, lat1: float, lon2: float, lat2: float, de
         lat2 = radians(lat2)
 
     delta_lon = lon2 - lon1
-    delta_lat = lat2 - lat1
-
     return acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(delta_lon))
+
+
+def great_circle_distance(lon1: float, lat1: float, lon2: float, lat2: float, radius: float = 6371e3, deg: bool = True):
+    """
+    Calculates the great circle distance between two points on the map, in metres. All units are interpreted as degrees
+    unless deg is given as False, in which case all units are interpreted as radians.
+    Constructed using https://en.wikipedia.org/wiki/Great-circle_distance
+    :param lon1: Longitude of first point.
+    :param lat1: Latitude of first point.
+    :param lon2: Longitude of second point.
+    :param lat2: Latitude of second points.
+    :param deg: Interpret units as degrees? If False, interprets as radians.
+    :param radius: Radius of the planet.
+    :return:
+    """
+    ang_dist = great_circle_ang_dist(lon1=lon1, lat1=lat1, lon2=lon2, lat2=lat2, deg=deg)
+    return radius * ang_dist
 
 
 location_types = ['city', 'natural']
@@ -74,9 +89,16 @@ marker_colours = ['r', 'g', 'b']
 
 
 class Map:
-    def __init__(self, image: str, locations: str = None):
+    def __init__(self, image: str, locations: str = None, planet_radius: float = 6371e3):
+        """
+
+        :param image:
+        :param locations:
+        :param planet_radius: In metres.
+        """
         self.image = image
         self.locations_path = locations
+        self.planet_radius = planet_radius
         if locations is not None:
             self.locations_tbl = tbl.Table.read(locations, format='ascii.csv')
         else:
