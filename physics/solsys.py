@@ -4,8 +4,6 @@ import datetime as dt
 import matplotlib.pyplot as plt
 
 
-
-
 # If JPL changes how their system works this entire thing is obsolete. That's coding for you!
 
 # TODO: Functionalise, Allow selectable planets
