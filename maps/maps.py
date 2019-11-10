@@ -78,11 +78,30 @@ location_types = ['city', 'natural']
 
 
 class Location:
-    def __init__(self, name: str = None, lon: float = None, lat: float = None, typ: str = None):
+    def __init__(self, name: str = None, lon: float = None, lat: float = None, typ: str = None, this_map=None):
+        """
+
+        :param name:
+        :param lon:
+        :param lat:
+        :param typ:
+        :param this_map:
+        """
         self.name = name
         self.lon = lon
         self.lat = lat
-        self.typ = typ
+        self.type = typ
+        self.map = this_map
+
+    def __str__(self):
+        return f"{self.name}; {self.type} at longitude = {self.lon}, latitude = {self.lat}"
+
+    def distance_to(self, other):
+        if self.map is not None:
+            return great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat,
+                                         radius=self.map.planet_radius)
+        else:
+            return great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat)
 
 
 marker_colours = ['r', 'g', 'b']
