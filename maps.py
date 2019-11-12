@@ -4,9 +4,10 @@ import numpy as np
 import astropy.table as tbl
 from typing import Union
 from math import *
+import imageio
 
 
-def plot_globe(file, centre_lat=0, centre_lon=0, show=True):
+def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show=True):
     bmap = Basemap(projection='ortho', lat_0=centre_lat, lon_0=centre_lon, resolution='l', area_thresh=1000.)
     bmap.warpimage(image=file)
     bmap.drawmapboundary()
@@ -19,7 +20,7 @@ def plot_globe(file, centre_lat=0, centre_lon=0, show=True):
     return bmap
 
 
-def plot_map(file, centre_lat=0, centre_lon=0, show=True, projection='cyl'):
+def plot_map(file: str, centre_lat: float = 0, centre_lon: float = 0, show: float = True, projection: str = 'cyl'):
     bmap = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90,
                    llcrnrlon=-180, urcrnrlon=180, resolution='c',
                    lat_0=centre_lat, lon_0=centre_lon)
@@ -126,6 +127,10 @@ class Map:
         self.create_locations()
 
     def create_locations(self):
+        """
+        Read locations from file.
+        :return:
+        """
         for loc in self.locations_tbl:
             print(loc)
             if loc['type'] not in self.locations:
@@ -133,21 +138,59 @@ class Map:
             location = Location(name=loc['name'], lon=loc['longitude'], lat=loc['latitude'], typ=loc['type'])
             self.locations[loc['type']].append(location)
 
-    def plot_locations(self, types: Union[list, str] = None, centre_lat=0, centre_lon=0, projection='ortho',
-                       fontsize=10):
-        if type(types) is str:
-            types = [types]
-        elif types is None:
-            types = self.locations.keys()
-
+    def plot_map(self, centre_lat: float = 0, centre_lon: float = 0, projection: str = 'ortho', output: str = None,
+                 show: bool = False):
+        """
+        Plots this map.
+        :param centre_lat:
+        :param centre_lon:
+        :param projection:
+        :param output:
+        :param show:
+        :return:
+        """
         if projection == 'ortho':
             bmap = plot_globe(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False)
         else:
             bmap = plot_map(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False,
                             projection=projection)
+        if output is not None:
+            plt.savefig(output)
+        if show:
+            plt.show()
+        return bmap
+
+    def plot_gif(self, output: str, centre_lat: float = 0, lon_interval: int = 10):
+        """
+        Plot an animated, rotating gif of the map.
+        :param output:
+        :param centre_lat:
+        :param lon_interval:
+        :return:
+        """
+        images = []
+        for lon in range(0, 360, lon_interval):
+            filename = output + str(lon) + '.png'
+            self.plot_map(centre_lat=centre_lat, centre_lon=lon, projection='ortho', output=filename, show=False)
+            plt.close()
+            print(filename)
+            images.append(imageio.imread(filename))
+        imageio.mimsave(output + 'rotating.gif', images)
+        return images
+
+    def plot_locations(self, types: Union[list, str] = None, centre_lat=0, centre_lon=0, projection='ortho',
+                       fontsize=10, output: str = None):
+        if type(types) is str:
+            types = [types]
+        elif types is None:
+            types = self.locations.keys()
+
+        bmap = self.plot_map(centre_lat=centre_lat, centre_lon=centre_lon, projection=projection, output=None)
 
         for i, typ in enumerate(types):
             for loc in self.locations[typ]:
                 bmap.plot(loc.lon, loc.lat, f'{marker_colours[i]}o', latlon=True)
                 plt.text(loc.lon, loc.lat, loc.name, c=marker_colours[i], fontsize=fontsize)
+        if output is not None:
+            plt.savefig(output)
         plt.show()
