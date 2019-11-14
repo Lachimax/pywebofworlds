@@ -9,7 +9,8 @@ import imageio
 
 # TODO: Interact directly with SVG?
 
-def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show=True):
+def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show: bool = True, meridians: bool = True,
+               parallels: bool = True):
     """
     Using an image file and basemap, creates an orthographic projection of the image. Assumes the image is in a
     cylindrical projection.
@@ -17,6 +18,8 @@ def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show=Tru
     :param centre_lat: Latitude to show at centre.
     :param centre_lon: Longitude to show at centre.
     :param show: Set to True to show the plot.
+    :param meridians: set to True to plot meridian lines.
+    :param parallels: Set to True to plot parallel lines.
     :return: Basemap object of map.
     """
     # Set up basemap object.
@@ -24,16 +27,18 @@ def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show=Tru
     # Draw plot.
     bmap.warpimage(image=file)
     bmap.drawmapboundary()
-    bmap.drawmeridians(np.arange(0, 360, 30))
-    bmap.drawparallels(np.arange(-90, 90, 30))
-
+    if meridians:
+        bmap.drawmeridians(np.arange(0, 360, 30))
+    if parallels:
+        bmap.drawparallels(np.arange(-90, 90, 30))
     if show:
         plt.show()
 
     return bmap
 
 
-def plot_map(file: str, centre_lat: float = 0, centre_lon: float = 0, show: float = True, projection: str = 'cyl'):
+def plot_map(file: str, centre_lat: float = 0, centre_lon: float = 0, show: float = True, projection: str = 'cyl',
+             meridians: bool = True, parallels: bool = True):
     """
     Using an image file and basemap, plots the map to the projection specified. Projections should be those supported in
     Basemap; not all projections will work.
@@ -41,6 +46,8 @@ def plot_map(file: str, centre_lat: float = 0, centre_lon: float = 0, show: floa
     :param centre_lat: Latitude to show at centre.
     :param centre_lon: Longitude to show at centre.
     :param show: Set to True to show the plot.
+    :param meridians: set to True to plot meridian lines.
+    :param parallels: Set to True to plot parallel lines.
     :param projection: Projection type, as listed at https://matplotlib.org/basemap/users/mapsetup.html
     :return: Basemap object for this map.
     """
@@ -50,9 +57,10 @@ def plot_map(file: str, centre_lat: float = 0, centre_lon: float = 0, show: floa
                    lat_0=centre_lat, lon_0=centre_lon)
     # Draw plot.
     bmap.warpimage(image=file)
-    bmap.drawmeridians(np.arange(0, 360, 30))
-    bmap.drawparallels(np.arange(-90, 90, 30))
-
+    if meridians:
+        bmap.drawmeridians(np.arange(0, 360, 30))
+    if parallels:
+        bmap.drawparallels(np.arange(-90, 90, 30))
     if show:
         plt.show()
 
