@@ -301,7 +301,7 @@ class WormholeGraph:
 
     def bf_creep(self, num=100, degree=5,
                  speed=lambda t: 0.1 * math.exp(0.0016 * t) / math.sqrt(
-                          1 + (0.1 * math.exp(0.0016 * t)) ** 2),
+                     1 + (0.1 * math.exp(0.0016 * t)) ** 2),
                  wait=lambda t: abs(np.random.normal(loc=100 * math.exp(-0.005 * t), scale=50)),
                  plot=False, start_date=0., end_date=None):
         """
