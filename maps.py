@@ -183,7 +183,7 @@ class Map:
             self.locations[loc['type']].append(location)
 
     def plot_map(self, centre_lat: float = 0, centre_lon: float = 0, projection: str = 'ortho', output: str = None,
-                 show: bool = False):
+                 show: bool = False, meridians: bool = True, parallels: bool = True):
         """
         Plots this map.
         :param centre_lat: Latitude to show at centre.
@@ -191,31 +191,38 @@ class Map:
         :param projection: Projection type, as listed at https://matplotlib.org/basemap/users/mapsetup.html
         :param output: Path to which to save the plot.
         :param show: Set to True to show the plot.
+        :param meridians: set to True to plot meridian lines.
+        :param parallels: Set to True to plot parallel lines.
         :return: Basemap object for this map.
         """
         if projection == 'ortho':
-            bmap = plot_globe(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False)
+            bmap = plot_globe(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False,
+                              meridians=meridians, parallels=parallels)
         else:
             bmap = plot_map(file=self.image, centre_lat=centre_lat, centre_lon=centre_lon, show=False,
-                            projection=projection)
+                            projection=projection, meridians=meridians, parallels=parallels)
         if output is not None:
             plt.savefig(output)
         if show:
             plt.show()
         return bmap
 
-    def plot_gif(self, output: str, centre_lat: float = 0, lon_interval: int = 10):
+    def plot_gif(self, output: str, centre_lat: float = 0, lon_interval: int = 10, meridians: bool = True,
+                 parallels: bool = True):
         """
         Plot an animated, rotating gif of the map.
         :param output: Path to which to save the frames and final gif.
         :param centre_lat: Latitude to show at centre.
         :param lon_interval: Longitude interval between frames.
+        :param meridians: set to True to plot meridian lines.
+        :param parallels: Set to True to plot parallel lines.
         :return: list of image objects.
         """
         images = []
         for lon in range(0, 360, lon_interval):
             filename = output + str(lon) + '.png'
-            self.plot_map(centre_lat=centre_lat, centre_lon=lon, projection='ortho', output=filename, show=False)
+            self.plot_map(centre_lat=centre_lat, centre_lon=lon, projection='ortho', output=filename, show=False,
+                          meridians=meridians, parallels=parallels)
             plt.close()
             print(filename)
             images.append(imageio.imread(filename))
