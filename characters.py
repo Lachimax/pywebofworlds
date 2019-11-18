@@ -168,7 +168,7 @@ class Character:
         self.sexuality = None
         self.species = None
 
-        #TODO: Account for non-biological parents, eg adoption
+        # TODO: Account for non-biological parents, eg adoption
 
         self.mother = None
         self.father = None
@@ -177,13 +177,15 @@ class Character:
         self.used = False
 
     def set_dob(self):
-        x=5
+        x = 5
 
     def det_dob(self, year, system='Julian'):
-        # Here I assume the distribution of age is a Gaussian, with a standard deviation of 34. This should vary for different species.
+        # Here I assume the distribution of age is a Gaussian, with a standard deviation of 34. This should vary for
+        # different species.
         dob = t.Date(system=system)
         # TODO Implement different std dev for different species' lifespans.
-        # TODO: Improve model of population age distribution. Probably has a flatter distribution that becomes a Gaussian for higher ages
+        # TODO: Improve model of population age distribution. Probably has a flatter distribution that becomes a
+        #  Gaussian for higher ages
         age = abs(np.random.normal(scale=34))
 
         yob = year - age
@@ -439,13 +441,12 @@ class CharacterList:
             elif chara.used is True:
                 outputvalues[i, 10] = '1'
 
-        np.savetxt(title + '.txt', outputvalues,
-                   fmt='%-6s %-11s %-11s %-11s %-8s %-8s %-11s %-11s %-11s %-11s %-1s',
-                   header='No.: Name:       D.O.B.:     Species:    Sex:     Gender:  Ethnicity:  Hand:       Religion:   Sexuality:  Used:'
+        np.savetxt(title + '.csv', outputvalues,
+                   fmt='%-6s,%-11s,%-11s,%-11s,%-8s,%-8s,%-11s,%-11s,%-11s,%-11s,%-1s',
+                   header='No.:,Name:,D.O.B.:,Species:,Sex:,Gender:,Ethnicity:,Hand:,Religion:,Sexuality:,Used:'
                    )
         #
         # print(outputvalues)
-
 
 
 class FamilyTree:
@@ -472,5 +473,3 @@ class FamilyTreeNode:
 
         else:
             self.children = list()
-
-
