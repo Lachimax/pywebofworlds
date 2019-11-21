@@ -338,7 +338,21 @@ class CharacterList:
     def __getitem__(self, item):
         return self.chars[item]
 
-    def add_character(self, char):
+    def __len__(self):
+        return len(self.chars)
+
+    def __str__(self):
+        string = ""
+        for i in range(len(self)):
+            string += str(i) + ' ' + self.chars[i].show() + '\n'
+        return string
+
+    def add_character(self, char: Character):
+        """
+        Add a Character to the CharacterList
+        :param char: Character to add.
+        :return:
+        """
         self.chars.append(char)
 
     def generate_character(self, add: bool = True):
@@ -373,13 +387,6 @@ class CharacterList:
         """
         for i in range(num):
             self.generate_character(add=True)
-
-    def length(self):
-        return len(self.chars)
-
-    def show(self):
-        for i in range(self.length()):
-            print(str(i) + ' ' + self.chars[i].show())
 
     def sort_dob(self):
         """
