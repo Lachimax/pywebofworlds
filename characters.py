@@ -8,9 +8,10 @@ import numpy as np
 # TODO: gender model
 # TODO: Automatic rebalance of random generation depending on in-use characters.
 
-# TODO: Maybe implement a class for location, incorporating date systems, demographics etc.
+# TODO: Maybe implement a class for location, incorporating date systems, demographics etc - maybe integrate with maps
+# module
 
-
+# TODO: Allow custom Demographic types
 class Demographic:
     """An object containing information about a demographic of a population, including the type (gender,
     ethnicity, etc.), name of the demographic, and percentage of the population it takes up.
@@ -153,6 +154,17 @@ class DemographicSet:
                 dem.percent = str(dems['Percentage'][i]).replace("b", "").replace("'", "").replace("%", "")
 
             self.d_list.append(dem)
+
+
+# Default DemographicSets based on Earth, 2016
+sexes2016 = DemographicSet([Demographic('Sex', 'Female', 49.15),
+                            Demographic('Sex', 'Male', 49.15),
+                            Demographic('Sex', 'Inter', 1.7)])
+species2016 = DemographicSet([Demographic('Species', 'Human', 100)])
+hands2016 = DemographicSet([Demographic('Hand', 'Right', 88),
+                            Demographic('Hand', 'Left', 10),
+                            Demographic('Hand', 'Cross', 1),
+                            Demographic('Hand', 'Ambi', 1)])
 
 
 class Character:
@@ -304,16 +316,12 @@ class Character:
 
 class CharacterList:
     def __init__(self, year=2016, location='Earth',
-                 sexes=DemographicSet(
-                     [Demographic('Sex', 'Female', 49.15), Demographic('Sex', 'Male', 49.15),
-                      Demographic('Sex', 'Inter', 1.7)]),
+                 sexes=sexes2016,
                  ethnicities=None,
-                 species=DemographicSet([Demographic('Species', 'Human', 100)]),
-                 hands=DemographicSet([Demographic('Hand', 'Right', 88), Demographic('Hand', 'Left', 10),
-                                       Demographic('Hand', 'Cross', 1),
-                                       Demographic('Hand', 'Ambi', 1)])):
+                 species=species2016,
+                 hands=species2016):
 
-        self.chars = list()
+        self.chars = []
 
         self.date = t.Date(year=year)
         self.location = location
@@ -378,8 +386,12 @@ class CharacterList:
     def sort_species(self):
         self.chars.sort(key=lambda char: char.species)
 
-    def out_dobs(self, typ=None):
-
+    def out_dobs(self, typ: str = None):
+        """
+        Return a list of character dates of birth.
+        :param typ: format of date to return; currently only supports entire date or just year.
+        :return: List
+        """
         lst = list()
         if typ is None:
             for char in self.chars:
@@ -391,7 +403,11 @@ class CharacterList:
 
         return lst
 
-    def read_from_file(self, path):
+    def read_from_file(self, path: str):
+        """
+        Loads a saved character list from a csv file.
+        :param path: Path to csv file.
+        """
         chars = np.genfromtxt(path, dtype=None, names=True)
         for i in chars['No']:
             char = Character()
@@ -421,31 +437,34 @@ class CharacterList:
 
             self.chars.append(char)
 
-    def write_to_file(self, title):
-
-        outputvalues = np.zeros([len(self.chars), 11], dtype=(str, 24))
+    def write_to_file(self, path):
+        """
+        Saves this character list to csv file.
+        :param path: Path of csv file to save.
+        :return:
+        """
+        output_values = np.zeros([len(self.chars), 11], dtype=(str, 24))
+        if path[-4:] != '.csv':
+            path += '.csv'
 
         for i, chara in enumerate(self):
-            outputvalues[i, 0] = str(i)
-            outputvalues[i, 1] = str(chara.name)
-            outputvalues[i, 2] = str(chara.dob.show())
-            outputvalues[i, 3] = str(chara.species)
-            outputvalues[i, 4] = str(chara.sex)
-            outputvalues[i, 5] = str(chara.gender)
-            outputvalues[i, 6] = str(chara.ethnicity)
-            outputvalues[i, 7] = str(chara.hand)
-            outputvalues[i, 8] = str(chara.religion)
-            outputvalues[i, 9] = str(chara.sexuality)
+            output_values[i, 0] = str(i)
+            output_values[i, 1] = str(chara.name)
+            output_values[i, 2] = str(chara.dob.show())
+            output_values[i, 3] = str(chara.species)
+            output_values[i, 4] = str(chara.sex)
+            output_values[i, 5] = str(chara.gender)
+            output_values[i, 6] = str(chara.ethnicity)
+            output_values[i, 7] = str(chara.hand)
+            output_values[i, 8] = str(chara.religion)
+            output_values[i, 9] = str(chara.sexuality)
 
             if chara.used is False:
-                outputvalues[i, 10] = '0'
+                output_values[i, 10] = '0'
             elif chara.used is True:
-                outputvalues[i, 10] = '1'
+                output_values[i, 10] = '1'
 
-        np.savetxt(title + '.csv', outputvalues,
+        np.savetxt(path + '.csv', output_values,
                    fmt='%-6s,%-11s,%-11s,%-11s,%-8s,%-8s,%-11s,%-11s,%-11s,%-11s,%-1s',
                    header='No.:,Name:,D.O.B.:,Species:,Sex:,Gender:,Ethnicity:,Hand:,Religion:,Sexuality:,Used:'
                    )
-        #
-        # print(outputvalues)
-        
