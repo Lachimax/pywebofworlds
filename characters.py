@@ -315,6 +315,7 @@ class Character:
 
 
 class CharacterList:
+    # TODO: Implement multiple names
     def __init__(self, year=2016, location='Earth',
                  sexes=sexes2016,
                  ethnicities=None,
@@ -337,10 +338,15 @@ class CharacterList:
     def __getitem__(self, item):
         return self.chars[item]
 
-    def add_char(self, char):
+    def add_character(self, char):
         self.chars.append(char)
 
-    def gen_char(self):
+    def generate_character(self, add: bool = True):
+        """
+        Generate a Character with random demographics.
+        :param add: Add to this CharacterList?
+        :return:
+        """
         char = Character()
         if self.eth_demo is not None:
             char.det_ethnic(self.eth_demo)
@@ -348,15 +354,25 @@ class CharacterList:
         char.det_sex(self.sex_demo)
         char.det_species(self.spec_demo)
         char.det_dob(self.date.year, self.system)
+        if add:
+            self.add_character(char=char)
 
         return char
 
-    def rand_char(self):
+    def random_character(self):
+        """
+        Return a random Character from the CharacterList.
+        :return: Character object selected at random from the CharacterList.
+        """
         return r.choice(self.chars)
 
     def populate(self, num):
+        """
+        Adds num randomly generated Characters (using self.gen_char()) to the CharacterList.
+        :param num: Number of Characters to add.
+        """
         for i in range(num):
-            self.add_char(self.gen_char())
+            self.generate_character(add=True)
 
     def length(self):
         return len(self.chars)
@@ -366,29 +382,50 @@ class CharacterList:
             print(str(i) + ' ' + self.chars[i].show())
 
     def sort_dob(self):
+        """
+        Sort the CharacterList by date-of-birth.
+        """
         self.chars.sort(key=lambda char: char.dob.show())
 
     def sort_ethnic(self):
+        """
+        Sort the CharacterList by ethnicity.
+        """
         self.chars.sort(key=lambda char: char.ethnicity)
 
     def sort_hand(self):
+        """
+        Sort the CharacterList by handedness.
+        """
         self.chars.sort(key=lambda char: char.hand)
 
     def sort_name(self):
+        """
+        Sort the CharacterList by name.
+        """
         self.chars.sort(key=lambda char: char.name)
 
     def sort_religion(self):
+        """
+        Sort the CharacterList by religion.
+        """
         self.chars.sort(key=lambda char: char.religion)
 
     def sort_sex(self):
+        """
+        Sort the CharacterList by biological sex.
+        """
         self.chars.sort(key=lambda char: char.sex)
 
     def sort_species(self):
+        """
+        Sort the CharacterList by species.
+        """
         self.chars.sort(key=lambda char: char.species)
 
     def out_dobs(self, typ: str = None):
         """
-        Return a list of character dates of birth.
+        Return a list of character dates of birth from the CharacterList.
         :param typ: format of date to return; currently only supports entire date or just year.
         :return: List
         """
@@ -441,7 +478,6 @@ class CharacterList:
         """
         Saves this character list to csv file.
         :param path: Path of csv file to save.
-        :return:
         """
         output_values = np.zeros([len(self.chars), 11], dtype=(str, 24))
         if path[-4:] != '.csv':
