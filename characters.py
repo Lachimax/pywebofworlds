@@ -21,7 +21,7 @@ class Demographic:
 
         if typ is not None:
             if typ not in self.accepted_types:
-                raise TypeError('Unaccepted demographic type')
+                raise TypeError('Unknown demographic type')
 
             if not isinstance(typ, str):
                 raise TypeError('type must be a string')
@@ -378,13 +378,14 @@ class CharacterList:
     def sort_species(self):
         self.chars.sort(key=lambda char: char.species)
 
-    def out_dobs(self, type=None):
+    def out_dobs(self, typ=None):
+
         lst = list()
-        if type is None:
+        if typ is None:
             for char in self.chars:
                 lst.append(char.dob)
 
-        if type == 'year':
+        if typ == 'year':
             for char in self.chars:
                 lst.append(char.dob.year)
 
