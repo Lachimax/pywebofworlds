@@ -448,28 +448,3 @@ class CharacterList:
         #
         # print(outputvalues)
 
-
-class FamilyTree:
-    def __init__(self, root=None):
-        if type(root) is FamilyTreeNode:
-            self.root = root
-
-        else:
-            self.root = None
-
-
-class FamilyTreeNode:
-
-    def __init__(self, parent=None, children=None):
-
-        if type(parent) is FamilyTreeNode:
-            self.parent = parent
-        else:
-            self.parent = None
-
-        for child in children:
-            if type(child) is FamilyTreeNode:
-                self.children.append(child)
-
-        else:
-            self.children = list()
