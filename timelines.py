@@ -119,6 +119,9 @@ class Date:
         elif format == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
 
+    def __str__(self):
+        return self.show(format='yyyy-mm-dd')
+
 
 # Date systems in my universe:
 gregorian = DateSystem(year=8766.152712096, year0=0,
