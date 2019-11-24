@@ -1,386 +1,277 @@
 import random as r
 import timelines as t
 import numpy as np
+from typing import Union, Iterable, List
+from astropy import table as tbl
 
 
 # TODO: Account for mixed ethnicities
 # TODO: Choose and implement sexuality model
 # TODO: gender model
 # TODO: Automatic rebalance of random generation depending on in-use characters.
+# TODO: Allow more flexible distributions of continuous traits - parent class DemographicSet with DiscreteDemoSet and
+#   ContinuousDemoSet as subclasses? Eg for sexuality / gender, on spectra; age
+# TODO: Allow correlation of demographics - for example, rates of homosexuality and bisexuality differ between males and
+#  females.
 
 # TODO: Maybe implement a class for location, incorporating date systems, demographics etc - maybe integrate with maps
-# module
-
-# TODO: Allow custom Demographic types
-class Demographic:
-    """An object containing information about a demographic of a population, including the type (gender,
-    ethnicity, etc.), name of the demographic, and percentage of the population it takes up.
-    """
-
-    def __init__(self, typ=None, name=None, percent=None):
-        self.accepted_types = ['Ethnicity', 'Gender', 'Hand', 'Religion', 'Sex', 'Sexuality', 'Species']
-
-        if typ is not None:
-            if typ not in self.accepted_types:
-                raise TypeError('Unknown demographic type')
-
-            if not isinstance(typ, str):
-                raise TypeError('type must be a string')
-            else:
-                self.type = typ
-
-        else:
-            self.type = None
-
-        if name is not None:
-            if not isinstance(name, str):
-                raise TypeError('name must be a string')
-            else:
-                self.name = name
-
-        else:
-            self.name = None
-
-        self.percent = percent
-
-    def show(self):
-        print(self.name + ', ' + str(self.percent) + '%')
-
+#   module.
 
 class DemographicSet:
-    """An object containing a set of demographics, ideally adding to 100%. Each set contains one type of demographic,
-    ie one set for ethnicity, one for sex, etc.
+    """An object containing a set of mutually exclusive demographics, ideally adding to 100%. Each set contains one
+    type of demographic.
+    Demographics are given in the form of a dictionary, with the keys as the names of the demographics and the values
+    as the percentage they make up.
     """
 
-    def __init__(self, demos=None, typ=None):
-        self.d_list = list()
-        self.type = typ
+    def __init__(self, trait: str, demographics: Union[str, dict] = None):
+        """
+        Initialise the DemographicSet object.
+        :param demographics: Either a dictionary containing the demographic information or a path to the file containing
+        it.
+        :param trait: Name of the demographic type, eg Sex, Ethnicity, Hand, etc.
+        """
+        self.demographics = {}
+        self.trait = str(trait)
+        if type(demographics) is dict:
+            # Use the dict to set demographic information.
+            self.add_demographics(demographics=demographics)
+        elif type(demographics) is str:
+            # Load the demographics information from file.
+            self.read_from_file(demographics)
+        else:
+            raise TypeError('Demographics must be string or dict.')
 
-        if demos is not None:
-            self.type = demos[0].type
-            self.add_demos(demos=demos)
+    def __getitem__(self, key: str):
+        return self.demographics[key]
 
-    def __getitem__(self, key):
-        return self.d_list[key]
+    def __setitem__(self, key: str, value: float):
+        self.demographics[key] = value
 
-    def __setitem__(self, key, value):
-        self.d_list[key] = value
+    def __str__(self):
+        string = ''
+        string += str(self.trait) + '\n'
+        for name in self.demographics:
+            string += self.demographics[name]
 
-    def add_demos(self, demos):
-        """Adds demographic objects to d_list
+    def __len__(self):
+        return len(self.demographics.keys())
 
-        :param demos: a list of demographic objects to be added.
+    def add_demographics(self, demographics: dict):
+        """Adds demographics to this DemographicSet and checks the sum of the percentages.
+        :param demographics: a dictionary of demographic objects to be added.
         """
 
-        if (not isinstance(demos, list)) | (not isinstance(demos[0], Demographic)):
-            raise TypeError('demos must be a list of demographics')
+        for name in demographics:
+            self[name] = float(demographics[name])
 
-        else:
+        total, check = self.check_sum()
 
-            # Use the list to set the type, if the type is not already set.
-            if self.type is None:
-                self.type = demos[0].type
+        if not check:
+            print("These demographics add to " + str(total) + "%")
 
-            for i in range(len(demos)):
-                if demos[i].type != self.type:
-                    raise ValueError('Demographics in a demographicSet object must be the same type')
-                else:
-                    self.d_list.append(demos[i])
+    def sum_percentages(self):
+        """
+        Adds the total of all percentages in the DemographicSet.
+        :return: Sum of percentages.
+        """
+        total = 0.
 
-            total = self.check_percentage()[1]
-            check = self.check_percentage()[0]
+        for name in self.demographics:
+            total += self[name]
 
-            if not check:
-                print("These demographics add to " + str(total) + "%")
+        return total
 
-    def show(self):
-        print(str(self.type))
-        for i in range(len(self.d_list)):
-            self.d_list[i].show()
-
-    def length(self):
-        return len(self.d_list)
-
-    def check_percentage(self):
+    def check_sum(self, tolerance: float = 0.1):
         """
         Checks that the percentages in a list add up to 100 (or close enough)
-        :return: True if sum is within 0.1 of 100; otherwise False;
+        :return: (True if sum is within 0.1 of 100; otherwise False), (total)
         """
 
-        total = 0
-
-        for i in range(len(self.d_list)):
-            total += self.d_list[i].percent
-
+        total = self.sum_percentages()
         delta = 100 - total
 
-        if abs(delta) > 0.1:
-            return False, total
-        else:
-            return True, total
-
-    def sort_name(self):
-        self.d_list.sort(key=lambda dem: dem.name)
-
-    def sort_percent(self):
-        self.d_list.sort(key=lambda dem: dem.percent)
-
-    def write_to_file(self, title):
-
-        outputvalues = np.zeros([len(self.d_list), 3], dtype=(str, 24))
-
-        for i, dem in enumerate(self):
-            outputvalues[i, 0] = str(i)
-            outputvalues[i, 1] = str(dem.name)
-            outputvalues[i, 2] = str(dem.percent) + '%'
-
-        np.savetxt(title + '.txt', outputvalues,
-                   fmt='%-6s %-11s %-11s ',
-                   header='Type: ' + self.type + '\n' + 'No.: Group:      Percentage:'
-                   )
-
-    def read_from_file(self, path):
-        with open(path, 'r') as f:
-            first_line = f.readline()
-            typ = first_line[8:]
-            self.type = typ.replace('\n', '')
-
-        dems = np.genfromtxt(path, dtype=None, names=True, skip_header=1)
-        for i in dems['No']:
-            dem = Demographic()
-            if dems['Group'][i] != b'None':
-                dem.name = str(dems['Group'][i]).replace("b", "").replace("'", "")
-            if dems['Percentage'][i] != b'None':
-                dem.percent = str(dems['Percentage'][i]).replace("b", "").replace("'", "").replace("%", "")
-
-            self.d_list.append(dem)
-
+        return not abs(delta) > tolerance, total
 
 # Default DemographicSets based on Earth, 2016
-sexes2016 = DemographicSet([Demographic('Sex', 'Female', 49.15),
-                            Demographic('Sex', 'Male', 49.15),
-                            Demographic('Sex', 'Inter', 1.7)])
-species2016 = DemographicSet([Demographic('Species', 'Human', 100)])
-hands2016 = DemographicSet([Demographic('Hand', 'Right', 88),
-                            Demographic('Hand', 'Left', 10),
-                            Demographic('Hand', 'Cross', 1),
-                            Demographic('Hand', 'Ambi', 1)])
+sexes2016 = DemographicSet(trait='Sex',
+                           demographics={'Female': 49.15,
+                                         'Male': 49.15,
+                                         'Intersex': 1.7})
+species2016 = DemographicSet(trait='Species',
+                             demographics={'Human': 100})
+hands2016 = DemographicSet(trait='Hand',
+                           demographics={'Right': 88,
+                                         'Left': 10,
+                                         'Cross': 1,
+                                         'Ambidextrous': 1})
+
+demographics2016 = (sexes2016, hands2016, species2016)
+
+
+# TODO: Rewrite all Character and CharacterList methods involving Demographics to allow a dictionary to be accepted, and
+#   turned into a Demographic object in-method.
 
 
 class Character:
-    def __init__(self):
-
+    def __init__(self, name: str = None):
+        self.name = name
         self.dob = t.Date()
-        self.ethnicity = None
-        self.gender = None
-        self.hand = None
-        self.name = None
-        self.religion = None
-        self.sex = None
-        self.sexuality = None
-        self.species = None
-
         # TODO: Account for non-biological parents, eg adoption
-
         self.mother = None
         self.father = None
         self.children = list()
-
+        self.traits = {}
         self.used = False
 
-    def set_dob(self):
-        x = 5
+    def __str__(self):
+        string = ''
+        string += f'Name: {self.name}\n'
+        string += f'Used: {self.used}\n'
+        string += f'D.O.B.: {self.dob}\n'
+        for trait in self.traits:
+            string += f'{trait}: {self[trait]}\n'
 
-    def det_dob(self, year, system='Julian'):
-        # Here I assume the distribution of age is a Gaussian, with a standard deviation of 34. This should vary for
-        # different species.
+        return string
+
+    def __getitem__(self, item: str):
+        return self.traits[item]
+
+    def __setitem__(self, key: str, value):
+        self.traits[key] = value
+
+    def det_dob(self, year, system: str = 'Julian', sigma: float = 34.):
+        """
+        Generate a date-of-birth, assuming the distribution of age is a Gaussian.
+        :param year: Year of current setting.
+        :param system: Date system.
+        :param sigma: Standard deviation of age distribution; default is 34, for human populations.
+        :return:
+        """
         dob = t.Date(system=system)
-        # TODO Implement different std dev for different species' lifespans.
         # TODO: Improve model of population age distribution. Probably has a flatter distribution that becomes a
         #  Gaussian for higher ages
-        age = abs(np.random.normal(scale=34))
-
+        age = abs(np.random.normal(scale=sigma))
         yob = year - age
-
         dob.rand_date()
         dob.set_year(yob)
 
         self.dob = dob
 
-    def det_ethnic(self, demos):
+    def trait_from_demographic(self, demographic_set: Union[DemographicSet, dict], trait: str = None):
+        """
+        Generate a character trait from a DemographicSet.
+        :param trait: Name of trait.
+        :param demographic_set: DemographicSet or dict containing demographic statistics.
+        :return:
+        """
+        if type(demographic_set) is dict:
+            if trait is None:
+                raise ValueError('If demographics is a dict, trait must be provided.')
+            else:
+                demographic_set = DemographicSet(demographics=demographic_set, trait=trait)
+        elif type(demographic_set) is not DemographicSet:
+            raise TypeError('demographics must be dict or DemographicSet.')
 
-        if demos.type != 'Ethnicity':
-            raise ValueError('Demographic type must be Ethnicity')
+        trait = demographic_set.trait
+        demographic_set.check_sum()
 
-        if not demos.check_percentage()[0]:
-            raise NameError('demographic list does not add to 100')
+        population = []
+        for name in demographic_set:
+            # TODO: This will only work to the nearest percent. Find a way around that?
+            for j in range(np.round(100 * demographic_set[name])):
+                population.append(name)
 
-        ethnicities = list()
-        for i in range(demos.length()):
-            for j in range(int(100 * demos[i].percent)):
-                ethnicities.extend([demos[i].name])
-
-        eth = r.choice(ethnicities)
-        self.ethnicity = eth
-
-    def det_hand(self, demos=DemographicSet(
-        [Demographic('Hand', 'Right', 88), Demographic('Hand', 'Left', 10), Demographic('Hand', 'Cross-dominant', 1),
-         Demographic('Hand', 'Ambidextrous', 1)])):
-
-        if demos.type != 'Hand':
-            raise ValueError('Demographic type must be Hand')
-
-        if not demos.check_percentage()[0]:
-            raise ValueError('demographic list does not add to 100')
-
-        hands = list()
-        for i in range(demos.length()):
-            for j in range(int(100 * demos[i].percent)):
-                hands.extend([demos[i].name])
-
-        hand = r.choice(hands)
-        self.hand = hand
-
-    def det_religion(self, demos):
-
-        if demos.type != 'Religion':
-            raise ValueError('Demographic type must be Religion')
-
-        if not demos.check_percentage()[0]:
-            raise NameError('demographic list does not add to 100')
-
-        religions = list()
-        for i in range(demos.length()):
-            for j in range(int(100 * demos[i].percent)):
-                religions.extend([demos[i].name])
-
-        rel = r.choice(religions)
-        self.religion = rel
-
-    def det_sex(self, demos=DemographicSet(
-        [Demographic('Sex', 'Female', 49.15), Demographic('Sex', 'Male', 49.15), Demographic('Sex', 'Intersex', 1.7)])):
-
-        if demos.type != 'Sex':
-            raise ValueError('Demographic type must be Sex')
-
-        if not demos.check_percentage()[0]:
-            raise NameError('demographic list does not add to 100')
-
-        sexes = list()
-        for i in range(demos.length()):
-            for j in range(int(100 * demos[i].percent)):
-                sexes.extend([demos[i].name])
-
-        sex = r.choice(sexes)
-        self.sex = sex
-
-    def det_species(self, demos=DemographicSet([Demographic('Species', 'Human', 100)])):
-
-        if demos.type != 'Species':
-            raise ValueError('Demographic type must be Species')
-
-        if not demos.check_percentage()[0]:
-            raise ValueError('demographic list does not add to 100')
-
-        species = list()
-        for i in range(demos.length()):
-            for j in range(int(100 * demos[i].percent)):
-                species.extend([demos[i].name])
-
-        sp = r.choice(species)
-        self.species = sp
-
-    def show(self):
-        string = ''
-        if self.name is not None:
-            string = string + 'Name: ' + str(self.name) + ', '
-        if self.dob is not None:
-            string = string + 'D.O.B.: ' + self.dob.show() + ', '
-        if self.species is not None:
-            string = string + 'Species: ' + str(self.species) + ', '
-        if self.sex is not None:
-            string = string + 'Sex: ' + str(self.sex) + ', '
-        if self.gender is not None:
-            string = string + 'Gender: ' + str(self.gender) + ', '
-        if self.ethnicity is not None:
-            string = string + 'Ethnicity: ' + str(self.ethnicity) + ', '
-        if self.hand is not None:
-            string = string + 'Hand: ' + str(self.hand) + ', '
-        if self.religion is not None:
-            string = string + 'Religion: ' + str(self.religion) + ', '
-        if self.sexuality is not None:
-            string = string + 'Sexuality: ' + str(self.sexuality) + ', '
-
-        return string
+        self[trait] = r.choice(population)
 
 
 class CharacterList:
     # TODO: Implement multiple names
-    def __init__(self, year=2016, location='Earth',
-                 sexes=sexes2016,
-                 ethnicities=None,
-                 species=species2016,
-                 hands=species2016):
+    def __init__(self, characters: Union[List[Character], str] = None, year: int = 2016, location: str = 'Earth',
+                 demographics_list: Iterable = demographics2016):
 
-        self.chars = []
+        if characters is None:
+            self.characters = []
+        if type(characters) is str:
+            self.read_from_file(path=characters)
+        elif type(characters) is list:
+            # TODO: Sanitise types in list
+            self.characters = characters
+        else:
+            raise TypeError('characters must be list or str.')
+
+        self.demographics_list = {}
+        if demographics_list is None:
+            for demographic_set in demographics_list:
+                self.add_demographic_set(demographic_set)
 
         self.date = t.Date(year=year)
         self.location = location
         if self.location == 'Earth':
             self.system = 'Julian'
 
-        if ethnicities is not None:
-            self.eth_demo = ethnicities
-        self.sex_demo = sexes
-        self.hand_demo = hands
-        self.spec_demo = species
-
     def __getitem__(self, item):
-        return self.chars[item]
+        return self.characters[item]
+
+    def __setitem__(self, key, value):
+        self.characters[key] = value
 
     def __len__(self):
-        return len(self.chars)
+        return len(self.characters)
 
     def __str__(self):
         string = ""
         for i in range(len(self)):
-            string += str(i) + ' ' + self.chars[i].show() + '\n'
+            string += str(i) + ' ' + str(self.characters[i])
         return string
 
-    def add_character(self, char: Character):
+    def add_demographic_set(self, demographic_set: Union[DemographicSet, dict], trait: str = None):
         """
-        Add a Character to the CharacterList
-        :param char: Character to add.
+        Add a set of demographics to the CharacterList.
+        :param demographic_set:
+        :param trait
         :return:
         """
-        self.chars.append(char)
+        if type(demographic_set) is dict:
+            if trait is not None:
+                demographic_set = DemographicSet(trait=str(trait), demographics=demographic_set)
+            else:
+                raise ValueError('If demographic_set is dict, trait must be provided.')
+        elif type(demographic_set) is not DemographicSet:
+            raise TypeError('demographic_set must be dict or DemographicSet, not ' + str(type(demographic_set)))
+
+        self.demographics_list[demographic_set.trait] = demographic_set
+
+    def add_character(self, character: Character):
+        """
+        Add a Character to the CharacterList
+        :param character: Character to add.
+        :return:
+        """
+        self.characters.append(character)
 
     def generate_character(self, add: bool = True):
         """
-        Generate a Character with random demographics.
+        Generate a Character with random demographics using those in this CharacterList.
         :param add: Add to this CharacterList?
         :return:
         """
-        char = Character()
-        if self.eth_demo is not None:
-            char.det_ethnic(self.eth_demo)
-        char.det_hand(self.hand_demo)
-        char.det_sex(self.sex_demo)
-        char.det_species(self.spec_demo)
-        char.det_dob(self.date.year, self.system)
+        character = Character()
+        character.det_dob(self.date.year, self.system)
+        for trait in self.demographics_list:
+            character.trait_from_demographic(demographic_set=self.demographics_list[trait])
         if add:
-            self.add_character(char=char)
-
-        return char
+            self.add_character(character=character)
+        return character
 
     def random_character(self):
         """
         Return a random Character from the CharacterList.
         :return: Character object selected at random from the CharacterList.
         """
-        return r.choice(self.chars)
+        return r.choice(self.characters)
 
-    def populate(self, num):
+    def populate(self, num: int):
         """
         Adds num randomly generated Characters (using self.gen_char()) to the CharacterList.
         :param num: Number of Characters to add.
@@ -388,47 +279,36 @@ class CharacterList:
         for i in range(num):
             self.generate_character(add=True)
 
-    def sort_dob(self):
+    def depopulate(self):
         """
-        Sort the CharacterList by date-of-birth.
+        Removes all unused characters (ie with used==False) from the CharacterList
+        :return:
         """
-        self.chars.sort(key=lambda char: char.dob.show())
+        for character in self.characters:
+            if not character.used:
+                self.characters.remove(character)
 
-    def sort_ethnic(self):
+    def sort_by_trait(self, trait: str):
         """
-        Sort the CharacterList by ethnicity.
+        :param trait:
+        :return:
         """
-        self.chars.sort(key=lambda char: char.ethnicity)
-
-    def sort_hand(self):
-        """
-        Sort the CharacterList by handedness.
-        """
-        self.chars.sort(key=lambda char: char.hand)
+        if trait in self.demographics_list:
+            self.characters.sort(key=lambda char: char[trait])
+        else:
+            raise ValueError('Trait not recognised.')
 
     def sort_name(self):
         """
         Sort the CharacterList by name.
         """
-        self.chars.sort(key=lambda char: char.name)
+        self.characters.sort(key=lambda char: char.name)
 
-    def sort_religion(self):
+    def sort_dob(self):
         """
-        Sort the CharacterList by religion.
+        Sort the CharacterList by date-of-birth.
         """
-        self.chars.sort(key=lambda char: char.religion)
-
-    def sort_sex(self):
-        """
-        Sort the CharacterList by biological sex.
-        """
-        self.chars.sort(key=lambda char: char.sex)
-
-    def sort_species(self):
-        """
-        Sort the CharacterList by species.
-        """
-        self.chars.sort(key=lambda char: char.species)
+        self.characters.sort(key=lambda char: char.dob.show())
 
     def out_dobs(self, typ: str = None):
         """
@@ -438,11 +318,11 @@ class CharacterList:
         """
         lst = list()
         if typ is None:
-            for char in self.chars:
+            for char in self.characters:
                 lst.append(char.dob)
 
         if typ == 'year':
-            for char in self.chars:
+            for char in self.characters:
                 lst.append(char.dob.year)
 
         return lst
@@ -479,14 +359,14 @@ class CharacterList:
             if chars['Used'][i] == 0:
                 char.used = False
 
-            self.chars.append(char)
+            self.characters.append(char)
 
     def write_to_file(self, path):
         """
         Saves this character list to csv file.
         :param path: Path of csv file to save.
         """
-        output_values = np.zeros([len(self.chars), 11], dtype=(str, 24))
+        output_values = np.zeros([len(self.characters), 11], dtype=(str, 24))
         if path[-4:] != '.csv':
             path += '.csv'
 
