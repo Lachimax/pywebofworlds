@@ -65,9 +65,17 @@ def format_csv_row(row: List[str], dtype: Union[List[type], type] = None):
     if len(dtypes) != len(row):
         raise ValueError(f'If provided as a list, dtypes must be of equal length to row ({len(dtypes)} != {len(row)}).')
 
+    new_row = []
+
     for i, cell in enumerate(row):
-        row[i] = dtypes[i](cell)
-    return row
+        if dtypes[i] is bool:
+            if cell == 'FALSE':
+                new_row[i] = False
+            else:
+                new_row[i] = True
+        else:
+            new_row[i] = dtypes[i](cell)
+    return new_row
 
 
 def split_csv_row(row: str):
