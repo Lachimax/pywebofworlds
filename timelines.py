@@ -16,17 +16,7 @@ class DateSystem:
 
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
 class Date:
-    def __int__(self, string: str, fmt: str = 'yyyy-mm-dd', system='Gregorian'):
-        if system in availableSystems:
-            self.system = availableSystems[system]
-        else:
-            raise ValueError('Date system not recognised')
-
-        self.max_days = self.system.month_lengths
-
-        self.str_to_date(date=string, fmt=fmt)
-
-    def __init__(self, year=None, month=None, day=None, time=None, system='Gregorian'):
+    def __init__(self, string: str = None, year=None, month=None, day=None, time=None, system='Gregorian'):
 
         if system in availableSystems:
             self.system = availableSystems[system]
@@ -35,18 +25,21 @@ class Date:
 
         self.max_days = self.system.month_lengths
 
-        self.year = int()
-        if year is not None:
-            self.set_year(year)
+        if string is not None:
+            self.str_to_date(date=string)
+        else:
+            self.year = int()
+            if year is not None:
+                self.set_year(year)
 
-        self.month_name = str()
-        self.month = int()
-        if month is not None:
-            self.set_month(month)
+            self.month_name = str()
+            self.month = int()
+            if month is not None:
+                self.set_month(month)
 
-        self.day = int()
-        if day is not None:
-            self.set_day(day)
+            self.day = int()
+            if day is not None:
+                self.set_day(day)
 
     def __str__(self):
         return self.show(fmt='yyyy-mm-dd')
