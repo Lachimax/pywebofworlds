@@ -70,11 +70,11 @@ def format_csv_row(row: List[str], dtype: Union[List[type], type] = None):
     for i, cell in enumerate(row):
         if dtypes[i] is bool:
             if cell == 'FALSE':
-                new_row[i] = False
+                new_row.append(False)
             else:
-                new_row[i] = True
+                new_row.append(True)
         else:
-            new_row[i] = dtypes[i](cell)
+            new_row.append(dtypes[i](cell))
     return new_row
 
 
