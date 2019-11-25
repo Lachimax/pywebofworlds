@@ -16,6 +16,16 @@ class DateSystem:
 
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
 class Date:
+    def __int__(self, string: str, fmt: str = 'yyyy-mm-dd', system='Gregorian'):
+        if system in availableSystems:
+            self.system = availableSystems[system]
+        else:
+            raise ValueError('Date system not recognised')
+
+        self.max_days = self.system.month_lengths
+
+        self.str_to_date(date=string, fmt=fmt)
+
     def __init__(self, year=None, month=None, day=None, time=None, system='Gregorian'):
 
         if system in availableSystems:
@@ -37,7 +47,6 @@ class Date:
         self.day = int()
         if day is not None:
             self.set_day(day)
-
 
     def set_year(self, year):
 
@@ -77,8 +86,8 @@ class Date:
 
         self.day = day
 
-    def str_to_date(self, date, format='yyyy-mm-dd'):
-        if format == 'yyyy-mm-dd':
+    def str_to_date(self, date: str, fmt: str = 'yyyy-mm-dd'):
+        if fmt == 'yyyy-mm-dd':
             self.year = int(date[0:4])
             self.month = int(date[5:7])
             self.day = int(date[8:])
@@ -92,13 +101,13 @@ class Date:
 
         self.set_day(np.random.randint(1, max_day + 1))
 
-    def show(self, format='yyyy-mm-dd'):
+    def show(self, fmt='yyyy-mm-dd'):
         available_formats = ['yyyy-mm-dd', 'Words']
 
-        if format not in available_formats:
+        if fmt not in available_formats:
             raise ValueError('Date format not recognised')
 
-        if format == 'yyyy-mm-dd':
+        if fmt == 'yyyy-mm-dd':
             zeros1 = ''
             if abs(self.year) < 1000:
                 zeros1 = '0'
@@ -117,7 +126,7 @@ class Date:
 
             return zeros1 + str(self.year) + '-' + zeros2 + str(self.month) + '-' + zeros3 + str(self.day)
 
-        elif format == 'Words':
+        elif fmt == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
 
     def __str__(self):
@@ -142,12 +151,8 @@ availableSystems = {'Earth': gregorian, 'Gregorian': gregorian, 'Pendant': penda
                     'Provectus': provectus, 'Rachara': rachara, 'Semartol': semartol}
 
 
-def str_to_date(string, format='yyyy-mm-dd'):
-    date = Date()
-    if format == 'yyyy-mm-dd':
-        date.year = int(string[0:4])
-        date.month = int(string[5:7])
-        date.day = int(string[8:])
+def str_to_date(string: str, fmt: str = 'yyyy-mm-dd'):
+    date = Date(string, fmt=fmt)
 
 
 def find_year(year, arr):
