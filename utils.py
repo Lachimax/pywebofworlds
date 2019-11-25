@@ -103,7 +103,7 @@ def split_csv_row(row: str, remove: str = None):
     for char in row:
         if char == ',' or char == '\n':
             if remove is not None:
-                cell.replace(remove, '')
+                cell = cell.replace(remove, '')
             cells.append(cell)
             cell = ''
         else:

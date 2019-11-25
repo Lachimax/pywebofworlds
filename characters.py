@@ -224,6 +224,7 @@ class CharacterList:
             characters = []
 
         if type(characters) is str:
+            self.characters = []
             self.read_from_file(path=characters)
         elif type(characters) is list:
             # TODO: Sanitise types in list
@@ -375,9 +376,9 @@ class CharacterList:
         for trait in self.demographics_list:
             names.append(trait + ':')
         for i, char in enumerate(self.characters):
-            row = f'{i},{char.name},{char.used},{char.dob},'
+            row = f'{i},{char.name},{char.used},{char.dob}'
             for trait in char.traits:
-                row += char[trait] + ','
+                row += ',' + char[trait]
             rows.append(row)
 
         header = 'CharacterList,'
@@ -389,3 +390,21 @@ class CharacterList:
                         header=header,
                         names=names,
                         rows=rows)
+
+    def read_from_file(self, path: str):
+        """
+        Reads the DemographicList from a .csv file.
+        :param path: Path of file, including name.
+        :return:
+        """
+        header, names, rows = u.read_wow_csv(path=path, dtype=[int, str, bool, str])
+        self.date = header[2]
+        self.system = header[4]
+        self.location = header[6]
+        for row in rows:
+            char = Character()
+            char.used = row[2]
+            char.dob = t.Date(string=row[3])
+            for i in range(4, len(row)):
+                char[names[i]] = row[i]
+            self.add_character(character=char)
