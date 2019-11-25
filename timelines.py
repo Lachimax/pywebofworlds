@@ -48,6 +48,9 @@ class Date:
         if day is not None:
             self.set_day(day)
 
+    def __str__(self):
+        return self.show(fmt='yyyy-mm-dd')
+
     def set_year(self, year):
 
         year = int(year)
@@ -128,9 +131,6 @@ class Date:
 
         elif fmt == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
-
-    def __str__(self):
-        return self.show(format='yyyy-mm-dd')
 
 
 # Date systems in my universe:
