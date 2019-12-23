@@ -82,7 +82,7 @@ def format_csv_row(row: List[str], dtype: Union[List[type], type] = None):
 
     for i, cell in enumerate(row):
         if dtypes[i] is bool:
-            if cell == 'FALSE':
+            if cell == 'FALSE' or cell == 'False':
                 new_row.append(False)
             else:
                 new_row.append(True)

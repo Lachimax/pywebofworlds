@@ -300,6 +300,8 @@ class CharacterList:
             self.add_character(character=character)
         return character
 
+    # TODO: Method for propagating and assigning a new trait, from demographic, to existing characters.
+
     def random_character(self):
         """
         Return a random Character from the CharacterList.
@@ -307,13 +309,22 @@ class CharacterList:
         """
         return r.choice(self.characters)
 
-    def populate(self, num: int):
+    def add_characters(self, num: int):
         """
         Adds num randomly generated Characters (using self.gen_char()) to the CharacterList.
-        :param num: Number of Characters to add.
+        :param population: Number of Characters to add.
         """
         for i in range(num):
             self.generate_character(add=True)
+
+    def populate(self, population: int):
+        """
+        Adds or removes characters to match population.
+        Characters with used==True are immune to removal.
+        :param population:
+        :return:
+        """
+
 
     def depopulate(self):
         """
@@ -323,6 +334,16 @@ class CharacterList:
         for character in self.characters:
             if not character.used:
                 self.characters.remove(character)
+
+    def repopulate(self, num: int):
+        """
+        Adds num randomly generated Characters to the CharacterList, taking the existing
+        characters into account.
+        :return:
+        """
+
+    def
+
 
     def sort_by_trait(self, trait: str):
         """
