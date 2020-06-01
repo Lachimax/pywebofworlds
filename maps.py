@@ -9,7 +9,7 @@ import imageio
 
 # TODO: Interact directly with SVG?
 
-def lat_from_map(self, x, y, scale=100):
+def lat_from_map(x, y, scale=100):
     """
     Take map coordinates and convert them to latitude and longitude. Assumes a cylindrical projection with lat=0,
     long=0 at the centre of the map.
@@ -21,6 +21,8 @@ def lat_from_map(self, x, y, scale=100):
     """
     lat = y / scale - 90
     long = x / scale - 180
+
+    return long, lat
 
 
 def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show: bool = True, meridians: bool = True,
