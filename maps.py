@@ -6,10 +6,12 @@ from typing import Union
 from math import *
 import imageio
 
+import physics.units as u
+
 
 # TODO: Interact directly with SVG?
 
-def lat_from_map(x, y, scale=100):
+def lon_lat_from_x_y(x, y, scale=100):
     """
     Take map coordinates and convert them to latitude and longitude. Assumes a cylindrical projection with lat=0,
     long=0 at the centre of the map.
@@ -20,9 +22,23 @@ def lat_from_map(x, y, scale=100):
     :return:
     """
     lat = y / scale - 90
-    long = x / scale - 180
+    lon = x / scale - 180
 
-    return long, lat
+    return lon, lat
+
+
+def x_y_from_lon_lat(lat, lon, scale=100):
+    """
+
+    :param lat:
+    :param lon:
+    :param scale:
+    :return:
+    """
+    x = (lon + 180) * scale
+    y = (lat + 90) * scale
+
+    return x, y
 
 
 def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show: bool = True, meridians: bool = True,
@@ -127,6 +143,17 @@ def great_circle_distance(lon1: float, lat1: float, lon2: float, lat2: float, ra
     return radius * ang_dist
 
 
+def travel_to(lon: float, lat: float, direction: float, radius: float = 6371e3):
+    """
+
+    :param lon:
+    :param lat:
+    :param direction: In degrees.
+    :param radius:
+    :return:
+    """
+
+
 location_types = ['city', 'natural']
 
 
@@ -165,6 +192,46 @@ class Location:
                                          radius=self.map.planet_radius)
         else:
             return great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat)
+
+    def travel_time(self, other, speed: float = 5., units: str = "kph"):
+        """
+
+        :param other:
+        :param speed:
+        :param units:
+        :return:
+        """
+        distance = self.distance_to(other)
+        speed = u.velocity_to_m_s(v=speed, units=units)
+        time = distance / speed
+        return time
+
+    def travel_days(self, other, speed: float = 4., units: str = "kph", time_per_day: float = 7.5):
+        """
+
+        :param other:
+        :param speed:
+        :param units:
+        :param time_per_day: In hours.
+        :return:
+        """
+        speed = u.velocity_to_velocity(velocity=speed, frm=units, to='kph')
+        time = self.travel_time(other=other, speed=speed, units=units)
+        days = time / time_per_day
+        return days
+
+    def travel_days_dpd(self, other, distance_per_day: float, units: str = "km"):
+        """
+
+        :param other:
+        :param distance_per_day:
+        :param units:
+        :return:
+        """
+        distance = self.distance_to(other)
+        distance_per_day = u.length_to_metre(length=distance_per_day, units=units)
+        days = distance / distance_per_day
+        return days
 
 
 marker_colours = ['r', 'g', 'b']
