@@ -483,7 +483,7 @@ kph = kilo / hr
 # US miles per hour (mph)
 mph = mi / hr
 
-vel_units = {"m_s": 1., "c": c}
+vel_units = {"m_s": 1., "c": c, "kph": kph, "mph": mph}
 
 
 def velocity_from_m_s(v, units='c'):
@@ -502,3 +502,13 @@ def velocity_to_m_s(v, units='c'):
     factor = vel_units[units]
 
     return v * factor
+
+
+def velocity_to_velocity(velocity, frm: str = 'mph', to: str = 'kph'):
+    if frm not in vel_units:
+        raise ValueError(frm + ' is an unrecognised unit.')
+    if to not in vel_units:
+        raise ValueError(to + ' is an unrecognised unit.')
+
+    velocity = velocity_from_m_s(velocity, frm)
+    return velocity_to_m_s(velocity, to)
