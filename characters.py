@@ -342,9 +342,6 @@ class CharacterList:
         :return:
         """
 
-    def
-
-
     def sort_by_trait(self, trait: str):
         """
         :param trait:
