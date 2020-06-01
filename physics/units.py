@@ -242,7 +242,7 @@ nmi = 1.852 * kilo
 # Earth radius
 R_E = 6.371e3
 
-length_units = {'m': 1., 'AU': AU, 'ly': ly, 'parsec': pc, 'pc': pc}
+length_units = {'m': 1., 'km': kilo, 'AU': AU, 'ly': ly, 'parsec': pc, 'pc': pc}
 
 
 def length_to_metre(length, units='AU'):
