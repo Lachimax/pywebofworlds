@@ -431,7 +431,7 @@ yr_Gregorian = 365.3435 * day
 # year, hence leap years.
 yr_orbital = 1.00001742096 * yr
 
-time_units = {"s": 1., "yr": yr}
+time_units = {"s": 1., "yr": yr, "hr": hr}
 
 
 def time_from_sec(time, units='yr'):
@@ -450,6 +450,11 @@ def time_to_sec(time, units='yr'):
     factor = time_units[units]
 
     return time * factor
+
+
+def time_to_time(time, frm: str = 's', to: str = 'kph'):
+    time = time_from_sec(time, frm)
+    return time_to_sec(time, to)
 
 
 # VELOCITY (in metres/second [m/s])
