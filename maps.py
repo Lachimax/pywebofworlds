@@ -193,7 +193,7 @@ class Location:
         else:
             return great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat)
 
-    def travel_time(self, other, speed: float = 5., units: str = "kph"):
+    def travel_time(self, other, speed: float = 4., units: str = "kph"):
         """
 
         :param other:
@@ -217,10 +217,11 @@ class Location:
         """
         speed = u.velocity_to_velocity(velocity=speed, frm=units, to='kph')
         time = self.travel_time(other=other, speed=speed, units=units)
+        time_per_day = u.time_to_sec(time=time_per_day, units="hr")
         days = time / time_per_day
         return days
 
-    def travel_days_dpd(self, other, distance_per_day: float, units: str = "km"):
+    def travel_days_dpd(self, other, distance_per_day: float = 30., units: str = "km"):
         """
 
         :param other:
