@@ -78,11 +78,6 @@ def acceleration_from_m_s_2(acc: "float", units="g"):
 
 
 def acceleration_to_acceleration(acc: "float", frm: "str", to: "str"):
-    if frm not in acceleration_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in acceleration_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     acc = acceleration_to_m_s_2(acc, frm)
     return acceleration_from_m_s_2(acc, to)
 
@@ -129,11 +124,6 @@ def angle_from_radians(angle: "float", units: "str" = "degree"):
 
 
 def angle_to_angle(angle: "float", frm: "str", to: "str"):
-    if frm not in angle_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in angle_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     angle = angle_to_radians(angle, frm)
     return angle_from_radians(angle, to)
 
@@ -274,11 +264,6 @@ def length_from_metre(length, units='AU'):
 
 
 def length_to_length(length, frm='pc', to='ly'):
-    if frm not in length_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in length_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     length = length_to_metre(length, frm)
     return length_from_metre(length, to)
 
@@ -398,11 +383,6 @@ def mass_from_kg(mass, units='M_E'):
 
 
 def mass_to_mass(mass, frm='M_E', to='M_J'):
-    if frm not in mass_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in mass_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     mass = mass_to_kg(mass, frm)
     return mass_from_kg(mass, to)
 
@@ -505,10 +485,5 @@ def velocity_to_m_s(v, units='c'):
 
 
 def velocity_to_velocity(velocity, frm: str = 'mph', to: str = 'kph'):
-    if frm not in vel_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in vel_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     velocity = velocity_from_m_s(velocity, frm)
     return velocity_to_m_s(velocity, to)
