@@ -145,6 +145,8 @@ class Location:
         self.lat = lat
         self.type = typ
         self.map = this_map
+        if self.map is not None:
+            self.map.add_location(self)
 
     def __str__(self):
         return f"{self.name}; {self.type} at longitude = {self.lon}, latitude = {self.lat}"
@@ -187,6 +189,14 @@ class Map:
         self.create_locations()
 
     def add_location(self, location: Location):
+        """
+        Add a location to this map's internal list of Locations.
+        :param location: Location object.
+        :return:
+        """
+        # Set location's map pointer to this map.
+        location.map = self
+        #
         self.create_location_type_list(location.type)
         self.locations[location.type].append(location)
 
@@ -206,9 +216,8 @@ class Map:
         """
         for loc in self.locations_tbl:
             print(loc)
-            self.create_location_type_list(typ=loc['type'])
             location = Location(name=loc['name'], lon=loc['longitude'], lat=loc['latitude'], typ=loc['type'])
-            self.locations[loc['type']].append(location)
+            self.add_location(location)
 
     def plot_map(self, centre_lat: float = 0, centre_lon: float = 0, projection: str = 'ortho', output: str = None,
                  show: bool = False, meridians: bool = True, parallels: bool = True):
