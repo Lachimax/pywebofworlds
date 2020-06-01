@@ -186,6 +186,19 @@ class Map:
         self.locations = {}
         self.create_locations()
 
+    def add_location(self, location: Location):
+        self.create_location_type_list(location.type)
+        self.locations[location.type].append(location)
+
+    def create_location_type_list(self, typ):
+        """
+        Utility function; checks if there is a list with the name given in self.locations, and creates it if not.
+        :param typ: Name of location type
+        :return:
+        """
+        if typ not in self.locations:
+            self.locations[typ] = []
+
     def create_locations(self):
         """
         Read locations from csv file into this Map.
@@ -193,8 +206,7 @@ class Map:
         """
         for loc in self.locations_tbl:
             print(loc)
-            if loc['type'] not in self.locations:
-                self.locations[loc['type']] = []
+            self.create_location_type_list(typ=loc['type'])
             location = Location(name=loc['name'], lon=loc['longitude'], lat=loc['latitude'], typ=loc['type'])
             self.locations[loc['type']].append(location)
 
