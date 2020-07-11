@@ -134,7 +134,7 @@ gregorian = DateSystem(year=8766.152712096, year0=0,
 
 # conjugus = DateSystem(year=21343.3036, year0=)
 pendant = DateSystem(year=8640, year0=1793.84,
-                     months=['Tolking', 'Rouling', 'Roddah', 'Leuis', 'Appelgaight', 'Kolfir', 'Zhoordin', 'Maarten'],
+                     months=['Torgien', 'Lodda', 'Rewis', 'Corper', 'Zholdan', 'Affelkate', 'Sherrey', 'Vuzhord'],
                      month_lengths=[30, 30, 30, 30, 30, 30, 30, 30])
 provectus = DateSystem(year=8766, year0=-999988290.59)
 rachara = DateSystem(year=168062.878, year0=-2026.71)
