@@ -1,17 +1,25 @@
 import numpy as np
+from typing import Union
 
 
 class DateSystem:
-    def __init__(self, year, year0, months=None, month_lengths=None):
+    def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None):
         """
 
         :param year: Year length of the date system, in hours
         :param year0: Year (Gregorian date) of the date system's year 0.
+        :param months: list of month names for your system. If a dict, keys should be month names and values should be
+            month lengths, in days; this will override month_lengths.
+        :param month_lengths: list of month lengths, in days, to correspond to the names.
         """
         self.year = year
         self.year0 = year0
-        self.months = months
-        self.month_lengths = month_lengths
+        if type(months) is dict:
+            self.months = list(months.keys())
+            self.month_lengths = list(months.values())
+        else:
+            self.months = months
+            self.month_lengths = month_lengths
 
 
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
