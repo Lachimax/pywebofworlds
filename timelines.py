@@ -3,7 +3,8 @@ from typing import Union
 
 
 class DateSystem:
-    def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None):
+    def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None,
+                 summer_start: float = 11. / 12.):
         """
 
         :param year: Year length of the date system, in hours
@@ -11,6 +12,7 @@ class DateSystem:
         :param months: list of month names for your system. If a dict, keys should be month names and values should be
             month lengths, in days; this will override month_lengths.
         :param month_lengths: list of month lengths, in days, to correspond to the names.
+        :param summer_start: fraction through the year at which summer begins.
         """
         self.year = year
         self.year0 = year0
@@ -21,15 +23,39 @@ class DateSystem:
             self.months = months
             self.month_lengths = month_lengths
 
+        self.summer_start = summer_start
+
+    def present_year(self):
+        """
+        Generate list of all days in the year.
+        :return:
+        """
+        days = []
+        for i, month in enumerate(self.months):
+            for j in range(self.month_lengths[i]):
+                days.append(Date(year=0, month=i, ))
+
+
+
 
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
+# TODO: Named month format
 class Date:
-    def __init__(self, string: str = None, year=None, month=None, day=None, time=None, system='Gregorian'):
+    def __init__(self, string: str = None, year: int = None, month: int = None, day: int = None, time=None,
+                 system: Union[DateSystem, str] = 'Gregorian'):
+        """
 
-        if system in availableSystems:
-            self.system = availableSystems[system]
-        else:
-            raise ValueError('Date system not recognised')
+        :param string: Date in string format. Overrides year, month, and day.
+        :param year:
+        :param month:
+        :param day:
+        :param time:
+        :param system: DateSystem to use. If a string is passed, attempts to match it to the defaults in
+            availableSystems.
+        """
+
+        # If 'system' is a string, attempt to use that to set the date system from the available defaults.
+        self.system = check_available(system)
 
         self.max_days = self.system.month_lengths
 
@@ -96,6 +122,17 @@ class Date:
             self.month = int(date[5:7])
             self.day = int(date[8:])
 
+    def day_of_year(self):
+        """
+        Calculate twhich numbered day of the year this is.
+        :return:
+        """
+        days = 0
+        for i in range(self.month - 1):
+            days += self.system.month_lengths[i]
+        days += self.day
+        return days
+
     def rand_date(self):
         self.set_year(np.random.randint(1, 10000))
 
@@ -143,7 +180,7 @@ gregorian = DateSystem(year=8766.152712096, year0=0,
 # conjugus = DateSystem(year=21343.3036, year0=)
 pendant = DateSystem(year=8640, year0=1793.84,
                      months=['Torgien', 'Lodda', 'Rewis', 'Corper', 'Zholdan', 'Affelkate', 'Sherrey', 'Vuzhord'],
-                     month_lengths=[30, 30, 30, 30, 30, 30, 30, 30])
+                     month_lengths=[30, 30, 30, 30, 30, 30, 30, 30], summer_start=11. / 12.)
 provectus = DateSystem(year=8766, year0=-999988290.59)
 rachara = DateSystem(year=168062.878, year0=-2026.71)
 semartol = DateSystem(year=22070.5, year0=-3585.07)
@@ -152,8 +189,19 @@ availableSystems = {'Earth': gregorian, 'Gregorian': gregorian, 'Pendant': penda
                     'Provectus': provectus, 'Rachara': rachara, 'Semartol': semartol}
 
 
+def check_available(system: Union[str, DateSystem]):
+    # If 'system' is a string, attempt to use that to set the date system from the available defaults.
+    if type(system) is str:
+        if system in availableSystems:
+            return availableSystems[system]
+        else:
+            raise ValueError('Date system not recognised')
+    elif type(system) is DateSystem:
+        return system
+
+
 def str_to_date(string: str, fmt: str = 'yyyy-mm-dd'):
-    date = Date(string, fmt=fmt)
+    return Date().str_to_date(string, fmt)
 
 
 def find_year(year, arr):
@@ -183,7 +231,7 @@ def line_func(x1, y1, x2, y2):
 
 def switch_year0(year0, yr_old, yr_new):
     """
-    For obtaining Year 0 system 1 in system 2, knowing Year 0 of system 2 in system 1
+    For obtaining Year 0 of system 1 in system 2, knowing Year 0 of system 2 in system 1
     :param year0:
     :param yr_old:
     :param yr_new:
@@ -192,10 +240,9 @@ def switch_year0(year0, yr_old, yr_new):
     return -year0 * (yr_new / yr_old)
 
 
-# TODO: Change this and other functions to accept DateSystem objects for old_sys and new_sys, as well as strings
-def convert_date_sys(t_old, old_sys: 'str' = 'Gregorian', new_sys: 'str' = 'Pendant'):
-    new_sys = availableSystems[new_sys]
-    old_sys = availableSystems[old_sys]
+def convert_date_sys(t_old, old_sys: Union[str, DateSystem] = 'Gregorian', new_sys: Union[str, DateSystem] = 'Pendant'):
+    new_sys = check_available(new_sys)
+    old_sys = check_available(old_sys)
 
     # First obtain the Gregorian Year 0 in the current system:
     year0 = switch_year0(year0=old_sys.year0, yr_old=old_sys.year, yr_new=gregorian.year)
