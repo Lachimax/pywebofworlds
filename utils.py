@@ -9,19 +9,28 @@ def leading_zeroes(n, digits=2):
     :param digits: Number of digits to pad to.
     :return:
     """
+
+    negative = False
+
     if n < 10 ** digits:
         # Get the number of digits in the number.
         if n == 0:
             n_digits = 1
         else:
+            if n < 0:
+                lead = "-"
+                n = -n
+            else:
+                lead = ""
             n_digits = int(m.log10(n)) + 1
         # Calculate the number of leading zeroes needed.
         zeroes = digits - n_digits
         # Append that number of zeroes
-        lead = ""
         for i in range(zeroes):
             lead = lead + "0"
+
         return lead + str(n)
+
     else:
         return str(n)
 
