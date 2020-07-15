@@ -1,10 +1,11 @@
 import numpy as np
+import utils as u
 from typing import Union
 
 
 class DateSystem:
     def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None,
-                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000, zero_padding: int = 4):
+                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000):
         """
 
         :param year: Year length of the date system, in hours
@@ -188,23 +189,8 @@ class Date:
             raise ValueError('Date format not recognised')
 
         if fmt == 'yyyy-mm-dd':
-            zeros1 = ''
-            if abs(self.year) < 1000:
-                zeros1 = '0'
-            if abs(self.year) < 100:
-                zeros1 = '00'
-            if abs(self.year) < 10:
-                zeros1 = '000'
-
-            zeros2 = ''
-            if self.month < 10:
-                zeros2 = '0'
-
-            zeros3 = ''
-            if self.day < 10:
-                zeros3 = '0'
-
-            return zeros1 + str(self.year) + '-' + zeros2 + str(self.month) + '-' + zeros3 + str(self.day)
+            return u.leading_zeroes(self.year, 4) + '-' + u.leading_zeroes(self.month, 2) + '-' + u.leading_zeroes(
+                self.day, 2)
 
         elif fmt == 'Words':
             return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
