@@ -4,7 +4,7 @@ from typing import Union
 
 class DateSystem:
     def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None,
-                 summer_start: float = 11. / 12.):
+                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000):
         """
 
         :param year: Year length of the date system, in hours
@@ -13,6 +13,8 @@ class DateSystem:
             month lengths, in days; this will override month_lengths.
         :param month_lengths: list of month lengths, in days, to correspond to the names.
         :param summer_start: fraction through the year at which summer begins.
+        :param max_year: maximum year.
+        :param min_year: minimum year.
         """
         self.year = year
         self.year0 = year0
@@ -24,6 +26,8 @@ class DateSystem:
             self.month_lengths = month_lengths
 
         self.summer_start = summer_start
+        self.max_year = max_year
+        self.min_year = min_year
 
     def days_in_year(self):
         return sum(self.month_lengths)
@@ -159,7 +163,7 @@ class Date:
         return days
 
     def rand_date(self):
-        self.set_year(np.random.randint(1, 10000))
+        self.set_year(np.random.randint(self.system.min_year, self.system.max_year + 1))
 
         self.set_month(np.random.randint(1, 13))
 
@@ -292,3 +296,6 @@ def convert_date(t_old, year0, yr_old, yr_new):
     """
 
     return (t_old - year0) * (yr_old / yr_new)
+
+
+def leading_zeroes(n, digits=2):
