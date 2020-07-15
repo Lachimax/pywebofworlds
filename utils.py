@@ -1,4 +1,29 @@
 from typing import List, Union
+import math as m
+
+
+def leading_zeroes(n, digits=2):
+    """
+    Converts n into a string, with front zero padding to the number of digits specified.
+    :param n: Number to be padded.
+    :param digits: Number of digits to pad to.
+    :return:
+    """
+    if n < 10 ** digits:
+        # Get the number of digits in the number.
+        if n == 0:
+            n_digits = 1
+        else:
+            n_digits = int(m.log10(n)) + 1
+        # Calculate the number of leading zeroes needed.
+        zeroes = digits - n_digits
+        # Append that number of zeroes
+        lead = ""
+        for i in range(zeroes):
+            lead = lead + "0"
+        return lead + str(n)
+    else:
+        return str(n)
 
 
 def sanitise_file_ext(path: str, ext: str = '.csv'):
