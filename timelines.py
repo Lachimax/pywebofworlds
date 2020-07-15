@@ -25,7 +25,13 @@ class DateSystem:
 
         self.summer_start = summer_start
 
-    def present_year(self):
+    def days_in_year(self):
+        return sum(self.month_lengths)
+
+    def date_of_nth_day(self, n):
+        return self.days_of_year()[n - 1]
+
+    def days_of_year(self):
         """
         Generate list of all days in the year.
         :return:
@@ -33,9 +39,28 @@ class DateSystem:
         days = []
         for i, month in enumerate(self.months):
             for j in range(self.month_lengths[i]):
-                days.append(Date(year=0, month=i, ))
+                days.append(Date(year=None, month=i + 1, day=j + 1, system=self))
+        return days
 
+    def equivalent_date(self, date: Union['Date', str], other: Union['DateSystem', str] = 'Gregorian'):
+        """
+        Gives you the equivalent date for the time of year in another system. Does not currently take seasons into account.
+        :param other:
+        :param date:
+        :return:
 
+        """
+        # If 'other' is a string, attempt to use that to set the date system from the available defaults.
+        other = check_available(other)
+
+        # If 'date' is a string, convert it to a Date object.
+        if type(date) is str:
+            date = Date(string=date)
+
+        # Divide the date's position in the year by the number of days in a year, then multiply by the number of days in
+        # other system's year to get the equivalent position.
+        position = other.days_in_year() * date.day_of_year() / self.days_in_year()
+        return other.days_of_year()[int(np.round(position))]
 
 
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
@@ -124,7 +149,7 @@ class Date:
 
     def day_of_year(self):
         """
-        Calculate twhich numbered day of the year this is.
+        Calculate which numbered day of the year this is.
         :return:
         """
         days = 0
@@ -142,6 +167,7 @@ class Date:
 
         self.set_day(np.random.randint(1, max_day + 1))
 
+    # TODO: Adapt this to use your order-of-magnitude code for adding leading zeroes.
     def show(self, fmt='yyyy-mm-dd'):
         available_formats = ['yyyy-mm-dd', 'Words']
 
