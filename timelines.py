@@ -4,7 +4,7 @@ from typing import Union
 
 class DateSystem:
     def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None,
-                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000):
+                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000, zero_padding: int = 4):
         """
 
         :param year: Year length of the date system, in hours
@@ -65,6 +65,18 @@ class DateSystem:
         # other system's year to get the equivalent position.
         position = other.days_in_year() * date.day_of_year() / self.days_in_year()
         return other.days_of_year()[int(np.round(position))]
+
+    def rand_date(self):
+        """
+        Produce a random Date in this system.
+        :return:
+        """
+
+        day = np.random.randint(self.days_in_year())
+        date = self.date_of_nth_day(day + 1)
+        date.set_year(np.random.randint(self.min_year, self.max_year + 1))
+
+        return date
 
 
 # TODO: Decimal year to date conversion (nontrivial with negative dates - have to flip)
@@ -163,13 +175,10 @@ class Date:
         return days
 
     def rand_date(self):
-        self.set_year(np.random.randint(self.system.min_year, self.system.max_year + 1))
-
-        self.set_month(np.random.randint(1, 13))
-
-        max_day = self.max_days[self.month - 1]
-
-        self.set_day(np.random.randint(1, max_day + 1))
+        date = self.system.rand_date()
+        self.day = date.day
+        self.month = date.month
+        self.year = date.year
 
     # TODO: Adapt this to use your order-of-magnitude code for adding leading zeroes.
     def show(self, fmt='yyyy-mm-dd'):
@@ -296,5 +305,3 @@ def convert_date(t_old, year0, yr_old, yr_new):
     """
 
     return (t_old - year0) * (yr_old / yr_new)
-
-
