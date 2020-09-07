@@ -5,7 +5,7 @@ from typing import Union
 
 class DateSystem:
     def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None,
-                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000):
+                 summer_start: float = 11. / 12., max_year: int = 10000, min_year: int = -10000, year_suffix: str = ""):
         """
 
         :param year: Year length of the date system, in hours
@@ -29,6 +29,7 @@ class DateSystem:
         self.summer_start = summer_start
         self.max_year = max_year
         self.min_year = min_year
+        self.year_suffix = year_suffix
 
     def days_in_year(self):
         return sum(self.month_lengths)
@@ -181,7 +182,6 @@ class Date:
         self.month = date.month
         self.year = date.year
 
-    # TODO: Adapt this to use your order-of-magnitude code for adding leading zeroes.
     def show(self, fmt='yyyy-mm-dd'):
         available_formats = ['yyyy-mm-dd', 'Words']
 
@@ -193,7 +193,7 @@ class Date:
                 self.day, 2)
 
         elif fmt == 'Words':
-            return self.month_name + ' ' + str(self.day) + ', ' + str(self.year)
+            return self.month_name + ' ' + str(self.day) + ', ' + str(self.year) + self.system.year_suffix
 
 
 # Date systems in my universe:
