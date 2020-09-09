@@ -2,6 +2,8 @@ from typing import List, Union
 import math as m
 
 
+# TODO: Standardise handling of CSV files using built in csv reader/writer
+
 def leading_zeroes(n, digits=2):
     """
     Converts n into a string, with front zero padding to the number of digits specified.
@@ -132,14 +134,18 @@ def split_csv_row(row: str, remove: str = None):
     :param remove: If specified, this string will be removed from each cell.
     :return:
     """
-    cells = []
-    cell = ''
-    for char in row:
-        if char == ',' or char == '\n':
+    return split_string(string=row, delimiter=',', remove=remove)
+
+
+def split_string(string: str, delimiter: str = ';', remove: str = None):
+    strings = []
+    string_piece = ''
+    for char in string:
+        if char == delimiter or char == '\n':
             if remove is not None:
-                cell = cell.replace(remove, '')
-            cells.append(cell)
-            cell = ''
+                string = string.replace(remove, '')
+            strings.append(string_piece)
+            string_piece = ''
         else:
-            cell += char
-    return cells
+            string += char
+    return strings
