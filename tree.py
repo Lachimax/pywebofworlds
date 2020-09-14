@@ -62,14 +62,5 @@ class TreeNode:
                 verticalalignment='top', bbox=props)
         if self.children:
             for child in self.children:
-                child.draw(ax=ax)
-                dx = child.x - self.x
-                dy = child.y - self.y
-                if edge_style == 'direct':
-                    ax.arrow(self.x, self.y, dx, dy, length_includes_head=True, width=0.05,
-                             color='black')
-                elif edge_style == 'square':
-                    ax.add_patch(Rectangle((self.x - 0.05, self.y), 0.1, dy / 2, facecolor='black'))
-                    ax.add_patch(Rectangle((self.x, self.y + dy / 2 - 0.05), dx, 0.05, facecolor='black'))
-                    ax.arrow(child.x, self.y + dy / 2, 0, dy / 2, length_includes_head=True, width=0.05,
-                             color='black')
+                draw_tree_line(ax=ax, origin_x=self.x, origin_y=self.y, destination_x=child.x, destination_y=child.y,
+                               edge_style=edge_style)
