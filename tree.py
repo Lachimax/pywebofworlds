@@ -4,23 +4,23 @@ from typing import Union, List
 
 
 def draw_tree_line(ax, origin_x: float, origin_y: float, destination_x: float, destination_y: float,
-                   colour: str = 'black', edge_style: str = 'direct'):
+                   colour: str = 'black', line_style: str = '-', edge_style: str = 'direct'):
     dx = destination_x - origin_x
     dy = destination_y - origin_y
 
     if edge_style == 'direct_no_arrow':
-        ax.plot([origin_x, destination_x], [origin_y, destination_y], c=colour)
+        ax.plot([origin_x, destination_x], [origin_y, destination_y], c=colour, ls=line_style)
     elif edge_style == 'direct':
         ax.arrow(origin_x, origin_y, dx, dy, length_includes_head=False, width=0.01,
-                 color=colour)
+                 color=colour, ls=line_style)
     elif edge_style == 'square':
         ax.plot([origin_x, origin_x, destination_x, destination_x],
-                [origin_y, origin_y + dy / 2, origin_y + dy / 2, destination_y], c=colour)
+                [origin_y, origin_y + dy / 2, origin_y + dy / 2, destination_y], c=colour, ls=line_style)
         ax.plot([destination_x - 0.01, destination_x, destination_x + 0.01],
-                [destination_y - 100, destination_y, destination_y - 100], c=colour)
+                [destination_y - 100, destination_y, destination_y - 100], c=colour, ls=line_style)
     elif edge_style == 'square_no_arrow':
         ax.plot([origin_x, origin_x, destination_x, destination_x],
-                [origin_y, origin_y + dy / 2, origin_y + dy / 2, destination_y], c=colour)
+                [origin_y, origin_y + dy / 2, origin_y + dy / 2, destination_y], c=colour, ls=line_style)
 
 
 class Tree:
