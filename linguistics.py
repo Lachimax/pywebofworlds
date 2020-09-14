@@ -175,8 +175,9 @@ class Language:
 
             for descendant in self.descendants:
                 print('\t\tDescendant:', descendant)
-                draw_tree_line(ax=ax, origin_x=self.parent.x, origin_y=self.parent.year, destination_x=self.x,
-                               destination_y=self.year, colour='red', edge_style=edge_style)
+                descendant = self.descendants[descendant]
+                draw_tree_line(ax=ax, origin_x=self.x, origin_y=self.year, destination_x=descendant.x,
+                               destination_y=descendant.year, colour='black', edge_style=edge_style)
                 descendant.plot(ax=ax, edge_style=edge_style)
         self.plotted = True
 
