@@ -7,15 +7,21 @@ from matplotlib.patches import Rectangle
 
 empty_strings = ['', ' ', None, 'None']
 
+#TODO: Writing ancestors to CSV is redundant
+
 class LanguageList:
-    def __init__(self, path: str = None, name: str = None, roots: Union[str, List[str]] = 'Classical Latin'):
+    def __init__(self, path: str = None, name: str = None, roots: Union[str, List[str]] = None):
         self.name = name
         self.languages = {}
         self.roots = []
-        if type(roots) is str:
-            roots = [roots]
-        for root in roots:
-            self.roots.append(self.add_empty_language(root))
+        if roots is not None:
+            if type(roots) is str:
+                roots = [roots]
+            for root in roots:
+                self.roots.append(self.add_empty_language(root))
+        else:
+            self.roots = None
+
         if path is not None:
             self.load_csv(path)
 
@@ -193,4 +199,4 @@ class Language:
             parent = str(self.parent)
         else:
             parent = None
-        return [self.name, str(self.year), self.x, self.family, parent, ancestors_string, descendants_string]
+        return [self.name, str(self.year), self.x, str(self.family), parent, ancestors_string, descendants_string]
