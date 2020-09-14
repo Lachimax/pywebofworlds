@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from tree import draw_tree_line
 from matplotlib.patches import Rectangle
 
+empty_strings = ['', ' ', None, 'None']
 
 class LanguageList:
     def __init__(self, path: str = None, name: str = None, roots: Union[str, List[str]] = 'Classical Latin'):
@@ -54,7 +55,7 @@ class LanguageList:
     def write_csv(self, path):
         path = utils.sanitise_file_ext(path=path, ext='.csv')
         rows = self.csv()
-        rows.sort(key=lambda r: (r[2], r[1], r[0]))
+        rows.sort(key=lambda r: (r[3], r[1], r[0]))
         header = ['Name', 'Year', 'x', 'Family', 'Parent', 'Ancestors', 'Descendants']
         # writing to csv file
         with open(path, 'w', newline='', encoding="utf-8") as csv_file:
@@ -90,7 +91,7 @@ class Language:
         language_list[self.name] = self
         self.year = year
         self.x = x
-        self.family = str(family)
+        self.family = family
         self.plotted = False
 
         if ancestors not in [None, ' ', '']:
@@ -112,23 +113,23 @@ class Language:
         return self.name
 
     def import_csv_row(self, row):
-        if self.year is None and row['Year'] not in ['', ' ', None]:
+        if self.year in empty_strings and row['Year'] not in empty_strings:
             self.year = float(row['Year'])
-        if self.x is None and row['x'] not in ['', ' ', None]:
+        if self.x in empty_strings and row['x'] not in empty_strings:
             self.x = float(row['x'])
-        if self.family is None and row['Family'] not in ['', ' ', None]:
+        if self.family in empty_strings and row['Family'] not in empty_strings:
             self.family = str(row['Family'])
-        if self.parent is None and row['Parent'] not in ['', ' ', None]:
+        if self.parent in empty_strings and row['Parent'] not in empty_strings:
             self.set_parent(name=row['Parent'])
 
         ancestor_strings = utils.split_string(row['Ancestors'])
         for ancestor in ancestor_strings:
-            if ancestor not in ['', ' ', None]:
+            if ancestor not in empty_strings:
                 self.add_ancestor(ancestor)
 
         descendant_strings = utils.split_string(row['Descendants'])
         for descendant in descendant_strings:
-            if descendant not in ['', ' ', None]:
+            if descendant not in empty_strings:
                 self.add_descendant(descendant)
 
     def add_ancestor(self, name: str):
@@ -161,24 +162,24 @@ class Language:
 
     def plot(self, ax, edge_style='square'):
         if not self.plotted:
-            ax.scatter(self.x, self.year, c='red')
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-            ax.text(self.x + 0.05, self.year, str(self.name), fontsize=14,
+            ax.text(self.x, self.year, str(self.name), fontsize=14,
                     verticalalignment='top', bbox=props)
 
-            print()
-            print('Language:', self.name)
-            print('\tParent:', self.parent)
-            if self.parent is not None:
-                draw_tree_line(ax=ax, origin_x=self.parent.x, origin_y=self.parent.year, destination_x=self.x,
-                               destination_y=self.year, colour='red', edge_style=edge_style)
-
             for descendant in self.descendants:
-                print('\t\tDescendant:', descendant)
                 descendant = self.descendants[descendant]
+
+                if descendant.parent is self:
+                    line_style = '-'
+                else:
+                    line_style = ':'
                 draw_tree_line(ax=ax, origin_x=self.x, origin_y=self.year, destination_x=descendant.x,
-                               destination_y=descendant.year, colour='black', edge_style=edge_style)
+                               destination_y=descendant.year, colour='black', edge_style=edge_style,
+                               line_style=line_style)
                 descendant.plot(ax=ax, edge_style=edge_style)
+
+            ax.scatter(self.x, self.year, c='red')
+
         self.plotted = True
 
     def csv(self):
