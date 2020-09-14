@@ -147,5 +147,5 @@ def split_string(string: str, delimiter: str = ';', remove: str = None):
             strings.append(string_piece)
             string_piece = ''
         else:
-            string += char
+            string_piece += char
     return strings
