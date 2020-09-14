@@ -7,7 +7,8 @@ from matplotlib.patches import Rectangle
 
 empty_strings = ['', ' ', None, 'None']
 
-#TODO: Writing ancestors to CSV is redundant
+
+# TODO: Writing ancestors to CSV is redundant
 
 class LanguageList:
     def __init__(self, path: str = None, name: str = None, roots: Union[str, List[str]] = None):
@@ -40,12 +41,12 @@ class LanguageList:
         for language in self.languages:
             self.languages[language].show()
 
-    def plot(self, edge_style='square'):
+    def plot(self, edge_style='square', arrow_size: float = 100.):
         figure = plt.figure()
         ax = figure.add_subplot(111)
         if self.roots is not None:
             for root in self.roots:
-                root.plot(ax=ax, edge_style=edge_style)
+                root.plot(ax=ax, edge_style=edge_style, arrow_size=arrow_size)
         else:
             print("No root defined for Tree.")
         ax.invert_yaxis()
@@ -166,7 +167,7 @@ class Language:
             descendants.append(str(descendant))
         return descendants
 
-    def plot(self, ax, edge_style='square'):
+    def plot(self, ax, edge_style='square', arrow_size: float = 100.):
         if not self.plotted:
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
             ax.text(self.x, self.year, str(self.name), fontsize=14,
@@ -181,8 +182,8 @@ class Language:
                     line_style = ':'
                 draw_tree_line(ax=ax, origin_x=self.x, origin_y=self.year, destination_x=descendant.x,
                                destination_y=descendant.year, colour='black', edge_style=edge_style,
-                               line_style=line_style)
-                descendant.plot(ax=ax, edge_style=edge_style)
+                               line_style=line_style, arrow_size=arrow_size)
+                descendant.plot(ax=ax, edge_style=edge_style, arrow_size=arrow_size)
 
             ax.scatter(self.x, self.year, c='red')
 
