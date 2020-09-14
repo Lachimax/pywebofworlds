@@ -37,6 +37,20 @@ class LanguageList:
             Language(name=name, language_list=self)
         return self.languages[name]
 
+    def add_language(self, name: str, year: Union[float, str], x: Union[float, str], family: str, parent: str,
+                     ancestors: Union[str, List[str]], descendants: Union[str, List[str]]):
+        language = self.add_empty_language(name=name)
+        if type(descendants) is list:
+            descendants = semicolon_list(descendants)
+        if type(ancestors) is list:
+            ancestors = semicolon_list(ancestors)
+        else:
+            raise TypeError('Only list or string accepted.')
+        row = {'Name': name, 'Year': str(year), 'x': str(x), 'Family': family, 'Parent': parent, 'Ancestors': ancestors,
+               'Descendants': descendants}
+        language.import_csv_row(row)
+        return language
+
     def show(self):
         for language in self.languages:
             self.languages[language].show()
@@ -101,17 +115,17 @@ class Language:
         self.family = family
         self.plotted = False
 
-        if ancestors not in [None, ' ', '']:
+        if ancestors not in empty_strings:
             self.ancestors = list_to_dict(ancestors)
         else:
             self.ancestors = {}
 
-        if descendants not in [None, ' ', '']:
+        if descendants not in empty_strings:
             self.descendants = list_to_dict(ancestors)
         else:
             self.descendants = {}
 
-        if parent not in [None, ' ', '']:
+        if parent not in empty_strings:
             self.parent = parent
         else:
             self.parent = None
@@ -129,25 +143,37 @@ class Language:
         if self.parent in empty_strings and row['Parent'] not in empty_strings:
             self.set_parent(name=row['Parent'])
 
-        ancestor_strings = utils.split_string(row['Ancestors'])
-        for ancestor in ancestor_strings:
-            if ancestor not in empty_strings:
-                self.add_ancestor(ancestor)
+        if row['Ancestors'] not in empty_strings:
+            if row['Ancestors'][-1] != ';':
+                row['Ancestors'] += ';'
+            ancestor_strings = utils.split_string(row['Ancestors'])
+            for ancestor in ancestor_strings:
+                if ancestor[-1] == ' ':
+                    ancestor = ancestor[:-1]
+                if ancestor not in empty_strings:
+                    self.add_ancestor(ancestor)
 
-        descendant_strings = utils.split_string(row['Descendants'])
-        for descendant in descendant_strings:
-            if descendant not in empty_strings:
-                self.add_descendant(descendant)
+        if row['Descendants'] not in empty_strings:
+            if row['Descendants'][-1] != ';':
+                row['Descendants'] += ';'
+            descendant_strings = utils.split_string(row['Descendants'])
+            for descendant in descendant_strings:
+                if descendant[-1] == ' ':
+                    descendant = descendant[:-1]
+                if descendant not in empty_strings:
+                    self.add_descendant(descendant)
 
     def add_ancestor(self, name: str):
         if name not in self.ancestors:
             self.ancestors[name] = self.language_list.add_empty_language(name)
             self.ancestors[name].add_descendant(self.name)
+        return self.ancestors[name]
 
     def add_descendant(self, name: str):
         if name not in self.descendants:
             self.descendants[name] = self.language_list.add_empty_language(name)
             self.descendants[name].add_ancestor(self.name)
+        return self.descendants[name]
 
     def set_parent(self, name: str):
         self.parent = self.language_list.add_empty_language(name)
@@ -168,36 +194,42 @@ class Language:
         return descendants
 
     def plot(self, ax, edge_style='square', arrow_size: float = 100.):
-        if not self.plotted:
+        if not self.plotted and self.x is not None and self.year is not None:
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
             ax.text(self.x, self.year, str(self.name), fontsize=14,
                     verticalalignment='top', bbox=props)
 
             for descendant in self.descendants:
                 descendant = self.descendants[descendant]
+                if descendant.x is not None and descendant.year is not None:
 
-                if descendant.parent is self:
-                    line_style = '-'
-                else:
-                    line_style = ':'
-                draw_tree_line(ax=ax, origin_x=self.x, origin_y=self.year, destination_x=descendant.x,
-                               destination_y=descendant.year, colour='black', edge_style=edge_style,
-                               line_style=line_style, arrow_size=arrow_size)
-                descendant.plot(ax=ax, edge_style=edge_style, arrow_size=arrow_size)
+                    if descendant.parent is self:
+                        line_style = '-'
+                    else:
+                        line_style = ':'
+
+                    draw_tree_line(ax=ax, origin_x=self.x, origin_y=self.year, destination_x=descendant.x,
+                                   destination_y=descendant.year, colour='black', edge_style=edge_style,
+                                   line_style=line_style, arrow_size=arrow_size)
+
+                    descendant.plot(ax=ax, edge_style=edge_style, arrow_size=arrow_size)
 
             ax.scatter(self.x, self.year, c='red')
 
         self.plotted = True
 
     def csv(self):
-        descendants_string = ""
-        for descendant in self.descendants:
-            descendants_string += descendant + ";"
-        ancestors_string = ""
-        for ancestor in self.ancestors:
-            ancestors_string += ancestor + ";"
+        descendants_string = semicolon_list(self.descendants)
+        ancestors_string = semicolon_list(self.ancestors)
         if self.parent is not None:
             parent = str(self.parent)
         else:
             parent = None
         return [self.name, str(self.year), self.x, str(self.family), parent, ancestors_string, descendants_string]
+
+
+def semicolon_list(lst=List[str]):
+    string_list = ""
+    for string in lst:
+        string_list += string + ";"
+    return string_list
