@@ -1,12 +1,16 @@
 from matplotlib import pyplot as plt
-from mpl_toolkits.basemap import Basemap
+# TODO: Move over to cartopy
+try:
+    from mpl_toolkits.basemap import Basemap
+except ImportError:
+    print("Basemap not installed. Map projection will not be available.")
 import numpy as np
 import astropy.table as tbl
 from typing import Union
 from math import *
 import imageio
 
-import physics.units as u
+from pywebofworlds.physics import units as u
 
 
 # TODO: Interact directly with SVG?
