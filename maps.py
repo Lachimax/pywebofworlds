@@ -1,9 +1,13 @@
 from matplotlib import pyplot as plt
+
 # TODO: Move over to cartopy
+
 try:
     from mpl_toolkits.basemap import Basemap
+    bmap_available = True
 except ImportError:
-    print("Basemap not installed. Map projection will not be available.")
+    print("basemap not installed. Map plotting will not be available.")
+    bmap_available = False
 import numpy as np
 import astropy.table as tbl
 from typing import Union
@@ -14,15 +18,21 @@ from pywebofworlds.physics import units as u
 
 
 # TODO: Interact directly with SVG?
+# TODO: Journey class; interact with date system in timelines
+    # Insert function (work like list)
 
-def lon_lat_from_x_y(x, y, scale=100):
+def check_basemap():
+    if not bmap_available:
+        print("basemap is not installed; map plotting is unavailable.")
+    return bmap_available
+
+def lon_lat_from_x_y(x: float, y: float, scale=100):
     """
     Take map coordinates and convert them to latitude and longitude. Assumes a cylindrical projection with lat=0,
     long=0 at the centre of the map.
-    :param self:
     :param x: x-coordinate on map
     :param y: y-coordinate on map
-    :param scale:
+    :param scale: The conversion factor between the coordinates on the map and longitude and latitude.
     :return:
     """
     lat = y / scale - 90
@@ -33,10 +43,11 @@ def lon_lat_from_x_y(x, y, scale=100):
 
 def x_y_from_lon_lat(lat, lon, scale=100):
     """
-
-    :param lat:
-    :param lon:
-    :param scale:
+    Take latitude and longitude and converts them into map coordinates, assuming a cylindrical projection with lat=0,
+    lon=0 at the centre of the map.
+    :param lat: Latitude of point.
+    :param lon: Longitude of point.
+    :param scale: The conversion factor between the coordinates on the map and longitude and latitude.
     :return:
     """
     x = (lon + 180) * scale
@@ -59,6 +70,8 @@ def plot_globe(file: str, centre_lat: float = 0, centre_lon: float = 0, show: bo
     :return: Basemap object of map.
     """
     # Set up basemap object.
+    if not check_basemap():
+        return None
     bmap = Basemap(projection='ortho', lat_0=centre_lat, lon_0=centre_lon, resolution='l', area_thresh=1000.)
     # Draw plot.
     bmap.warpimage(image=file)
@@ -87,6 +100,8 @@ def plot_map(file: str, centre_lat: float = 0, centre_lon: float = 0, show: floa
     :param projection: Projection type, as listed at https://matplotlib.org/basemap/users/mapsetup.html
     :return: Basemap object for this map.
     """
+    if not check_basemap():
+        return None
     # Set up basemap object.
     bmap = Basemap(projection=projection, llcrnrlat=-90, urcrnrlat=90,
                    llcrnrlon=-180, urcrnrlon=180, resolution='c',
