@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 
 try:
     from mpl_toolkits.basemap import Basemap
+
     bmap_available = True
 except ImportError:
     print("basemap not installed. Map plotting will not be available.")
@@ -14,17 +15,20 @@ from typing import Union
 from math import *
 import imageio
 
+from astropy import units as un
+
 from pywebofworlds.physics import units as u
 
 
 # TODO: Interact directly with SVG?
 # TODO: Journey class; interact with date system in timelines
-    # Insert function (work like list)
+# Insert function (work like list)
 
 def check_basemap():
     if not bmap_available:
         print("basemap is not installed; map plotting is unavailable.")
     return bmap_available
+
 
 def lon_lat_from_x_y(x: float, y: float, scale=100):
     """
@@ -153,9 +157,11 @@ def great_circle_distance(lon1: float, lat1: float, lon2: float, lat2: float, ra
     :param lon2: Longitude of second point.
     :param lat2: Latitude of second points.
     :param deg: Interpret units as degrees? If False, interprets as radians.
-    :param radius: Radius of the planet.
+    :param radius: Radius of the planet, in metres.
     :return: float, great circle distance, in metres.
     """
+    if type(radius) is not un.Quantity:
+        radius *= un.m
     # Calculate great circle angular distance.
     ang_dist = great_circle_ang_dist(lon1=lon1, lat1=lat1, lon2=lon2, lat2=lat2, deg=deg)
     # Multiply by radius of planet.
@@ -207,12 +213,13 @@ class Location:
         :return: float, great circle distance, in metres.
         """
         if self.map is not None:
-            return great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat,
-                                         radius=self.map.planet_radius)
+            distance = great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat,
+                                             radius=self.map.planet_radius)
         else:
-            return great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat)
+            distance = great_circle_distance(lon1=self.lon, lat1=self.lat, lon2=other.lon, lat2=other.lat)
+        return distance
 
-    def travel_time(self, other, speed: float = 4., units: str = "kph"):
+    def travel_time(self, other, speed: float = 4., units: str = "m/s"):
         """
 
         :param other:
@@ -220,12 +227,14 @@ class Location:
         :param units:
         :return:
         """
+        if speed is not un.Quantity:
+            speed = un.Quantity(speed, units)
         distance = self.distance_to(other)
-        speed = u.velocity_to_m_s(v=speed, units=units)
+        # u.velocity_to_m_s(v=speed, units=units)
         time = distance / speed
         return time
 
-    def travel_days(self, other, speed: float = 4., units: str = "kph", time_per_day: float = 7.5):
+    def travel_days(self, other, speed: float = 4., units: str = "km/h", time_per_day: float = 7.5):
         """
 
         :param other:
@@ -234,11 +243,17 @@ class Location:
         :param time_per_day: In hours.
         :return:
         """
-        speed = u.velocity_to_velocity(velocity=speed, frm=units, to='kph')
+        if type(speed) is not un.Quantity:
+            speed = speed * un.km / un.hour
+        else:
+            speed = speed.to(un.km / un.hour)  # u.velocity_to_velocity(velocity=speed, frm=units, to='kph')
         time = self.travel_time(other=other, speed=speed, units=units)
-        time_per_day = u.time_to_sec(time=time_per_day, units="hr")
+        if type(time_per_day) is not un.Quantity:
+            time_per_day = time_per_day * un.hour / un.day
+        else:
+            time_per_day = time_per_day.to(un.hour / un.day)  # u.time_to_sec(time=time_per_day, units="hr")
         days = time / time_per_day
-        return days
+        return days.to(un.day)
 
     def travel_days_dpd(self, other, distance_per_day: float = 30., units: str = "km"):
         """
