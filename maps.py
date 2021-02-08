@@ -11,7 +11,7 @@ except ImportError:
     bmap_available = False
 import numpy as np
 import astropy.table as tbl
-from typing import Union
+from typing import Union, List
 from math import *
 import imageio
 
@@ -183,7 +183,8 @@ location_types = ['city', 'natural']
 
 
 class Location:
-    def __init__(self, name: str = None, lon: float = None, lat: float = None, typ: str = None, this_map: "Map" = None):
+    def __init__(self, name: str = None, lon: float = None, lat: float = None, typ: str = None, this_map: "Map" = None,
+                 nxt: "Location" = None, previous: "Location" = None):
         """
 
         :param name: Name of location.
@@ -191,6 +192,7 @@ class Location:
         :param lat: Latitude of location.
         :param typ: Type of location.
         :param this_map: The Map object on which this location belongs.
+        :param nxt: The next location. Used when Location is part of a Journey, to link one Location to the next.
         """
         self.name = name
         self.lon = lon
@@ -393,3 +395,36 @@ class Map:
         if output is not None:
             plt.savefig(output)
         plt.show()
+
+
+class JourneyLocation:
+    def __init__(self, location: Location, nxt: "JourneyLocation" = None, previous: "JourneyLocation" = None):
+        self.location = location
+        self.next = None
+        if nxt is not None:
+            self.set_next(nxt)
+        self.previous = None
+        if previous is not None:
+            self.set_previous(previous)
+
+    def set_next(self, nxt: "JourneyLocation"):
+        nxt.previous = self
+        self.next = nxt
+
+    def set_previous(self, previous: "JourneyLocation"):
+        previous.next = self
+        self.previous = previous
+
+
+class Journey:
+    def __init__(self, locations: List[Location]):
+        self.locations = []
+        self.legs = []
+        for location in locations:
+            self.append(location)
+
+    def insert(self, index: int, location: Location):
+        self.locations.insert(index=index, object=location)
+
+    def append(self, location: Location):
+        self.locations.append(location)
