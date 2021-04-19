@@ -9,6 +9,9 @@ from pywebofworlds import utils as u
 na_vals = ["", None, masked]
 
 
+# TODO: Comment!!!
+# TODO: Catch bad story list entries.
+
 class GlossaryEntry:
     def __init__(self, name: str, text: str, plural: str = None, word_type: str = "", binomial: str = None,
                  see: List[str] = None, stories: dict = None, mask: bool = False):
