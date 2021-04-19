@@ -133,7 +133,7 @@ class GlossaryEntry:
                 f"\t<li><b>{self.name}"
 
             if self.plural is not None or self.binomial is not None:
-                html_str += "("
+                html_str += " ("
 
                 if self.plural is not None:
                     html_str += f"pl. {self.plural}"
