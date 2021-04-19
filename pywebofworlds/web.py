@@ -18,6 +18,8 @@ class GlossaryEntry:
                  word_type: str = "",
                  see: List[str] = None, stories: dict = None, mask: bool = False):
         self.name = name
+        if not text.endswith("."):
+            text += "."
         self.text = text
         self.formatted_name = formatted_name
         self.plural = plural
