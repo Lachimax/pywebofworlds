@@ -13,13 +13,15 @@ na_vals = ["", None, masked]
 # TODO: Catch bad story list entries.
 
 class GlossaryEntry:
-    def __init__(self, name: str, text: str, formatted_name: str = None, plural: str = None, word_type: str = "",
+    def __init__(self, name: str, text: str, formatted_name: str = None, plural: str = None, alternate_name: str = None,
                  binomial: str = None,
+                 word_type: str = "",
                  see: List[str] = None, stories: dict = None, mask: bool = False):
         self.name = name
         self.text = text
         self.formatted_name = formatted_name
         self.plural = plural
+        self.alternate_name = alternate_name
         self.word_type = word_type
         self.binomial = binomial
         self.stories = stories
@@ -35,6 +37,9 @@ class GlossaryEntry:
         formatted_name = None
         if row["formatted_name"] not in na_vals:
             formatted_name = row["formatted_name"]
+        alternate_name = None
+        if row["alternate_name"] not in na_vals:
+            formatted_name = row["alternate_name"]
         plural = None
         if row["plural"] not in na_vals:
             plural = row["plural"]
@@ -61,6 +66,7 @@ class GlossaryEntry:
 
         return cls(name=row["name"],
                    formatted_name=formatted_name,
+                   alternate_name=alternate_name,
                    text=row["text"],
                    plural=plural,
                    word_type=word_type,
@@ -114,9 +120,9 @@ class GlossaryEntry:
                     series_title = series_entry['title']
                     url = series_entry['url']
                     if len(story_entry) == 0:
-                        story_html += f'\t\t\t\t<i><a href="{url}">{series_title}</i></a>\n'
+                        story_html += f'\t\t\t\t<a href="{url}"><i>{series_title}</i></a>\n'
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
-                        story_html += f'\t\t\t\t<i><a href="{story_entry[0]["url"]}">{series_title}</i> - {story_entry[0]["title"]}</a>\n'
+                        story_html += f'\t\t\t\t<a href="{story_entry[0]["url"]}"><i>{series_title}</i> - {story_entry[0]["title"]}</a>\n'
                     else:
                         story_html += \
                             f"\t\t\t\t<i><a href='{url}'>{series_title}</a></i>\n" \
@@ -143,6 +149,9 @@ class GlossaryEntry:
                 name = self.formatted_name
             else:
                 name = self.name
+
+            if self.alternate_name is not None:
+                name = f"{name}</b> or <b>{self.alternate_name}"
 
             html_str = \
                 f"\t<li><b>{name}"
@@ -171,7 +180,7 @@ class Glossary:
         story_path = os.path.join(path, "stories.csv")
         glossary_path = os.path.join(path, "glossary.csv")
 
-        self.glossary_table = table.Table.read(glossary_path, format="ascii.csv", encoding="utf-16")
+        self.glossary_table = table.Table.read(glossary_path, format="ascii.csv", encoding="utf-8")
         self.glossary_table.sort('name')
         self.story_table = table.Table.read(story_path, format="ascii.csv", encoding="utf-16")
 
