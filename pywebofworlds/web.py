@@ -104,9 +104,11 @@ class GlossaryEntry:
                     series_entry = self.stories[short_title]
                     series_title = series_entry['title']
                     url = series_entry['url']
+                    if len(story_entry) == 0:
+                        story_html += f'\t\t\t\t<i><a href="{url}">{series_title}</i></a>\n'
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
                         story_html += f'\t\t\t\t<i><a href="{story_entry[0]["url"]}">{series_title}</i> - {story_entry[0]["title"]}</a>\n'
-                    elif len:
+                    else:
                         story_html += \
                             f"\t\t\t\t<i><a href='{url}'>{series_title}</a></i>\n" \
                             f"\t\t\t\t<ul>\n"
