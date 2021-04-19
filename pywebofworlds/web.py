@@ -100,19 +100,18 @@ class GlossaryEntry:
             for short_title in self.see:
                 print(short_title)
                 story_html = f"<li>\n"
-                story_entry = self.stories[short_title]
+                story_entry = self.see[short_title]
                 print(story_entry)
                 if type(story_entry) is list:
-                    series_title = self.see[short_title]['title']
+                    series_title = self.stories[short_title]['title']
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
                         story_html += f"\t<i>{series_title}</i> - {story_entry[0]}\n"
                     elif len:
                         story_html += \
-                            f"""\t<i>{short_title}</i>
+                            f"""\t<i>{series_title}</i>
                             \t<ul>
                             """
-                        for subtitle in story_entry:
-                            sub_story_entry = story_entry[subtitle]
+                        for sub_story_entry in story_entry:
                             story_html += f"\t\t<li>{sub_story_entry['title']}</li>\n"
                         story_html += "\t</ul>\n"
                 else:
