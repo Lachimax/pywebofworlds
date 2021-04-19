@@ -36,7 +36,6 @@ class GlossaryEntry:
         binomial = None
         if row["binomial"] not in na_vals:
             binomial = row["binomial"]
-        print(row["mask"])
         if row["mask"] in na_vals or row["mask"] == "FALSE":
             mask = False
         else:
@@ -96,40 +95,36 @@ class GlossaryEntry:
         if self.mask or not self.see:
             html_str = ""
         else:
-            html_str = "<ul>\n"
+            html_str = "See:\n" \
+                       "\t<ul>\n"
             for short_title in self.see:
-                print(short_title)
-                story_html = f"<li>\n"
+                story_html = f"\t\t<li>\n"
                 story_entry = self.see[short_title]
-                print(story_entry)
                 if type(story_entry) is list:
                     series_title = self.stories[short_title]['title']
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
-                        story_html += f"\t<i>{series_title}</i> - {story_entry[0]}\n"
+                        story_html += f"\t\t<i>{series_title}</i> - {story_entry[0]}\n"
                     elif len:
                         story_html += \
-                            f"""\t<i>{series_title}</i>
-                            \t<ul>
-                            """
+                            f"\t\t<i>{series_title}</i>\n" \
+                            f"\t\t<ul>\n"
                         for sub_story_entry in story_entry:
-                            story_html += f"\t\t<li>{sub_story_entry['title']}</li>\n"
-                        story_html += "\t</ul>\n"
+                            story_html += f"\t\t\t<li>{sub_story_entry['title']}</li>\n"
+                        story_html += "\t\t</ul>\n"
                 else:
-                    story_html += f"\t<i>{story_entry['title']}</i>\n"
+                    story_html += f"\t\t<i>{story_entry['title']}</i>\n"
 
-                story_html += "</li>"
+                story_html += "\t\t</li>\n"
                 html_str += story_html
 
-            html_str += "\n</ul>\n"
+            html_str += "\t</ul>\n"
 
         return html_str
 
     def to_html(self):
         html_str = \
-            f"""\t<li>"""
-
-        html_str += """"\t</li>
-            """
+            f"\t<li><b>{self.name}:</b> {self.text} {self.see_to_html()}" \
+            f"\t</li>\n\n"
         return html_str
 
 
@@ -173,10 +168,10 @@ class Glossary:
         return self.glossary
 
     def to_html(self):
-        html_str = "<ul>\n\n"
+        html_str = "<ul>\n"
         for entry in self.glossary:
             html_str += self[entry].to_html()
-        html_str += "\n\n</ul>"
+        html_str += "</ul>"
         return html_str
 
     def write_html(self, path):
