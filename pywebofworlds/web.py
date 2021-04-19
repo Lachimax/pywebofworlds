@@ -13,10 +13,12 @@ na_vals = ["", None, masked]
 # TODO: Catch bad story list entries.
 
 class GlossaryEntry:
-    def __init__(self, name: str, text: str, plural: str = None, word_type: str = "", binomial: str = None,
+    def __init__(self, name: str, text: str, formatted_name: str = None, plural: str = None, word_type: str = "",
+                 binomial: str = None,
                  see: List[str] = None, stories: dict = None, mask: bool = False):
         self.name = name
         self.text = text
+        self.formatted_name = formatted_name
         self.plural = plural
         self.word_type = word_type
         self.binomial = binomial
@@ -30,6 +32,9 @@ class GlossaryEntry:
     @classmethod
     def from_row(cls, row: table.Row, stories: dict = None):
 
+        formatted_name = None
+        if row["formatted_name"] not in na_vals:
+            formatted_name = row["formatted_name"]
         plural = None
         if row["plural"] not in na_vals:
             plural = row["plural"]
@@ -55,6 +60,7 @@ class GlossaryEntry:
                 see.append(string)
 
         return cls(name=row["name"],
+                   formatted_name=formatted_name,
                    text=row["text"],
                    plural=plural,
                    word_type=word_type,
@@ -132,8 +138,14 @@ class GlossaryEntry:
         if self.mask:
             html_str = ""
         else:
+
+            if self.formatted_name is not None:
+                name = self.formatted_name
+            else:
+                name = self.name
+
             html_str = \
-                f"\t<li><b>{self.name}"
+                f"\t<li><b>{name}"
 
             if self.plural is not None or self.binomial is not None:
                 html_str += " ("
