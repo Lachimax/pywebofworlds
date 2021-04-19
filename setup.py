@@ -1,6 +1,4 @@
 import setuptools
-from shutil import copy
-from os import getcwd
 
 packages = setuptools.find_packages()
 

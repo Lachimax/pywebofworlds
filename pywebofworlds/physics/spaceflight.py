@@ -1,5 +1,5 @@
 from src.pywebofworlds import physics as u, physics as a, physics as m
-import src.pywebofworlds.physics.relativity as r
+import pywebofworlds.physics.relativity as r
 import math
 import matplotlib.pyplot as plt
 import numpy as np
