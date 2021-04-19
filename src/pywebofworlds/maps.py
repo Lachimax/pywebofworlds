@@ -10,12 +10,12 @@ except ImportError:
     print("basemap not installed. Map plotting will not be available.")
     bmap_available = False
 import numpy as np
-import astropy.table as tbl
 from typing import Union, List
 from math import *
 import imageio
 
 from astropy import units as un
+import astropy.table as tbl
 
 from pywebofworlds.physics import units as u
 

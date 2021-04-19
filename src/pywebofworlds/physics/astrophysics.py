@@ -12,13 +12,11 @@ be calculated from its mass using star.ms_luminosity().
 import numpy as np
 import numpy.random as r
 import math
-import physics.units as u
-import physics.maths as ma
+from src.pywebofworlds import physics as u, physics as ma
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 # This SAYS it is unused, but it isn't. Do not delete.
-from mpl_toolkits.mplot3d import Axes3D
 
 
 # from queue import PriorityQueue
