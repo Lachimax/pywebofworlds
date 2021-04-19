@@ -92,7 +92,7 @@ class GlossaryEntry:
         Generate html code to represent the See list.
         """
         # If
-        if self.mask or not self.see:
+        if not self.see:
             html_str = ""
         else:
             html_str = "See:\n" \
@@ -101,18 +101,20 @@ class GlossaryEntry:
                 story_html = f"\t\t\t<li>\n"
                 story_entry = self.see[short_title]
                 if type(story_entry) is list:
-                    series_title = self.stories[short_title]['title']
+                    series_entry = self.stories[short_title]
+                    series_title = series_entry['title']
+                    url = series_entry['url']
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
-                        story_html += f"\t\t\t\t<i>{series_title}</i> - {story_entry[0]}\n"
+                        story_html += f'\t\t\t\t<i><a href="{story_entry[0]["url"]}">{series_title}</i> - {story_entry[0]["title"]}</a>\n'
                     elif len:
                         story_html += \
-                            f"\t\t\t\t<i>{series_title}</i>\n" \
+                            f"\t\t\t\t<i><a href='{url}'>{series_title}</a></i>\n" \
                             f"\t\t\t\t<ul>\n"
                         for sub_story_entry in story_entry:
-                            story_html += f"\t\t\t\t\t<li>{sub_story_entry['title']}</li>\n"
+                            story_html += f'\t\t\t\t\t<li><a href="{sub_story_entry["url"]}">{sub_story_entry["title"]}</a></li>\n'
                         story_html += "\t\t\t\t</ul>\n"
                 else:
-                    story_html += f"\t\t<i>{story_entry['title']}</i>\n"
+                    story_html += f'\t\t<i><a href="{story_entry["url"]}">{story_entry["title"]}</a></i>\n'
 
                 story_html += "\t\t\t</li>\n"
                 html_str += story_html
@@ -122,9 +124,12 @@ class GlossaryEntry:
         return html_str
 
     def to_html(self):
-        html_str = \
-            f"\t<li><b>{self.name}:</b> {self.text} {self.see_to_html()}\n" \
-            f"\t</li>\n\n"
+        if self.mask:
+            html_str = ""
+        else:
+            html_str = \
+                f"\t<li><b>{self.name}:</b> {self.text} {self.see_to_html()}\n" \
+                f"\t</li>\n\n"
         return html_str
 
 
@@ -137,6 +142,7 @@ class Glossary:
         glossary_path = os.path.join(path, "glossary.csv")
 
         self.glossary_table = table.Table.read(glossary_path, format="ascii.csv", encoding="utf-16")
+        self.glossary_table.sort('name')
         self.story_table = table.Table.read(story_path, format="ascii.csv", encoding="utf-16")
 
         self.stories = {}
