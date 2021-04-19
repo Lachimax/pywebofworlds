@@ -128,8 +128,21 @@ class GlossaryEntry:
             html_str = ""
         else:
             html_str = \
-                f"\t<li><b>{self.name}:</b> {self.text} {self.see_to_html()}\n" \
-                f"\t</li>\n\n"
+                f"\t<li><b>{self.name}"
+
+            if self.plural is not None or self.binomial is not None:
+                html_str += "("
+
+                if self.plural is not None:
+                    html_str += f"pl. {self.plural}"
+                    if self.binomial is not None:
+                        html_str += "; "
+                if self.binomial is not None:
+                    html_str += f"<i>{self.binomial}</i>"
+                html_str += ")"
+
+            html_str += f":</b> {self.text} {self.see_to_html()}\n" \
+                        f"\t</li>\n\n"
         return html_str
 
 
