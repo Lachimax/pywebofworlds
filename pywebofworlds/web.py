@@ -166,7 +166,12 @@ class GlossaryEntry:
                     if self.binomial is not None:
                         html_str += "; "
                 if self.binomial is not None:
-                    html_str += f"<i>{self.binomial}</i>"
+                    if self.word_type == "taxon:species":
+                        html_str += f"<i>{self.binomial}</i>"
+                    elif self.word_type == "taxon:genus":
+                        html_str += f"genus <i>{self.binomial}</i>"
+                    elif self.word_type.startswith("taxon:"):
+                        html_str += f"{self.word_type[self.word_type.find(':') + 1:]} {self.binomial}"
                 html_str += ")"
 
             html_str += f":</b> {self.text} {self.see_to_html()}\n" \
