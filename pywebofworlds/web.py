@@ -23,7 +23,8 @@ class GlossaryEntry:
                  binomial: str = None,
                  word_type: str = "",
                  see: List[str] = None, stories: dict = None, mask: bool = False):
-        self.name = name
+        self.name = name.lower()
+        self.id = replace_all(self.name, " ", "-")
         if not text.endswith("."):
             text += "."
         self.text = text
@@ -162,7 +163,7 @@ class GlossaryEntry:
                 name = f"{name}</b> or <b>{self.alternate_name}"
 
             html_str = \
-                f"\t<li><b>{name}"
+                f'\t<li id="{self.id}"><b>{name}'
 
             if self.plural is not None or self.binomial is not None:
                 html_str += " ("
@@ -188,6 +189,8 @@ class GlossaryEntry:
 # TODO: Check if the files are correctly formatted
 # TODO: Write to file; and
 # TODO: write empty template file (as classmethod using dummy instance)
+# TODO: auto-hyperlinking within file;
+
 class Glossary:
     def __init__(self, path: str):
         story_path = os.path.join(path, "stories.csv")
