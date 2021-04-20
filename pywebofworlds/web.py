@@ -9,6 +9,12 @@ from pywebofworlds import utils as u
 na_vals = ["", None, masked]
 
 
+def replace_all(string: str, replace: str, replace_with: str = ""):
+    while replace in string:
+        string = string.replace(replace, replace_with)
+    return string
+
+
 # TODO: Comment!!!
 # TODO: Catch bad story list entries.
 
