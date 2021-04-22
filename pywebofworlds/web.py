@@ -25,6 +25,8 @@ class GlossaryEntry:
                  see: List[str] = None, stories: dict = None, mask: bool = False):
         self.name = name.lower()
         self.id = replace_all(self.name, " ", "-")
+        while text.endswith(" "):
+            text = text[:-1]
         if not text.endswith("."):
             text += "."
         self.text = text
