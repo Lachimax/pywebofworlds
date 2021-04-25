@@ -175,7 +175,7 @@ class GlossaryEntry:
                     if self.binomial is not None:
                         html_str += "; "
                 if self.binomial is not None:
-                    if self.word_type == "taxon:species":
+                    if self.word_type == "taxon:species" or self.word_type is "taxon:subspecies":
                         html_str += f"<i>{self.binomial}</i>"
                     elif self.word_type == "taxon:genus":
                         html_str += f"genus <i>{self.binomial}</i>"
