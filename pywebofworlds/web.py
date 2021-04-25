@@ -34,6 +34,8 @@ class GlossaryEntry:
         self.plural = plural
         self.alternate_name = alternate_name
         self.word_type = word_type
+        if ":" in self.word_type:
+            self.word_type = self.word_type.split(":")
         self.binomial = binomial
         self.stories = stories
         if type(see) is list:
@@ -93,7 +95,14 @@ class GlossaryEntry:
         if self.plural is not None:
             dictionary["plural"] = self.plural
         if self.word_type is not None:
-            dictionary["type"] = self.word_type
+            type_str = ""
+            if type(self.word_type) is list:
+                for word in self.word_type:
+                    type_str += f"{word}:"
+                type_str = type_str[:-1]
+            else:
+                type_str = self.word_type
+            dictionary["type"] = type_str
         if self.binomial is not None:
             dictionary["binomial"] = self.binomial
 
@@ -175,12 +184,14 @@ class GlossaryEntry:
                     if self.binomial is not None:
                         html_str += "; "
                 if self.binomial is not None:
-                    if self.word_type == "taxon:species" or self.word_type == "taxon:subspecies":
-                        html_str += f"<i>{self.binomial}</i>"
-                    elif self.word_type == "taxon:genus":
-                        html_str += f"genus <i>{self.binomial}</i>"
-                    elif self.word_type.startswith("taxon:"):
-                        html_str += f"{self.word_type[self.word_type.find(':') + 1:]} {self.binomial}"
+                    if type(self.word_type) is list:
+                        if self.word_type[0] == "taxon":
+                            if self.word_type[1] in ["species", "subspecies"]
+                                html_str += f"<i>{self.binomial}</i>"
+                            elif self.word_type[1] == "genus":
+                                html_str += f"genus <i>{self.binomial}</i>"
+                            else:
+                                html_str += f"{self.word_type[0]} {self.binomial}"
                 html_str += ")"
 
             html_str += f":</b> {self.text} {self.see_to_html()}\n" \
