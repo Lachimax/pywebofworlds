@@ -186,7 +186,7 @@ class GlossaryEntry:
                 if self.binomial is not None:
                     if type(self.word_type) is list:
                         if self.word_type[0] == "taxon":
-                            if self.word_type[1] in ["species", "subspecies"]
+                            if self.word_type[1] in ["species", "subspecies"]:
                                 html_str += f"<i>{self.binomial}</i>"
                             elif self.word_type[1] == "genus":
                                 html_str += f"genus <i>{self.binomial}</i>"
@@ -218,6 +218,9 @@ class Glossary:
 
         self.glossary = {}
         self.parse_glossary()
+
+        self.types = {}
+        self.count_types()
 
     def parse_story_table(self):
         self.stories = {}
@@ -255,6 +258,22 @@ class Glossary:
             file.write(html_str)
         return html_str
 
+    def count_types(self):
+        types = {}
+        sums = {}
+        for item in self:
+            word_type = item.word_type
+            if word_type is not None:
+                if type(word_type) is list:
+                    this_dict = {}
+                    # for i, word in enumerate(word_type):
+                    #     if word in types:
+                    #         if types[word] is dict:
+                else:
+                    types = increment_dict(types, word_type)
+
+        self.types = types
+
     def __getitem__(self, key):
         return self.glossary[key]
 
@@ -262,3 +281,14 @@ class Glossary:
         if value is not GlossaryEntry:
             raise TypeError("Can only directly set values of type GlossaryEntry")
         self.glossary[key] = value
+
+
+def increment_dict(dictionary: dict, key: str, add: int = 1):
+    if key in dictionary:
+        if type(dictionary[key]) is int:
+            dictionary[key] += add
+        else:
+            raise ValueError(f"Dictionary value at '{key}' is not int.")
+    else:
+        dictionary[key] = add
+    return dictionary
