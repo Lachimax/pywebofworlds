@@ -114,15 +114,18 @@ class GlossaryEntry:
     def see_to_dict(self, see):
         stories_dict = {}
         for name in see:
-            story = self.stories[name]
-            if ":" in name:
-                series = name[:name.find(":")]
-                if series not in stories_dict:
-                    stories_dict[series] = [story]
+            if name in self.stories:
+                story = self.stories[name]
+                if ":" in name:
+                    series = name[:name.find(":")]
+                    if series not in stories_dict:
+                        stories_dict[series] = [story]
+                    else:
+                        stories_dict[series].append(story)
                 else:
-                    stories_dict[series].append(story)
+                    stories_dict[name] = story
             else:
-                stories_dict[name] = story
+                raise ValueError(f"{name} missing from story list.")
         return stories_dict
 
     # TODO: Sort see by order in "stories (unless there is a primary source?)"
