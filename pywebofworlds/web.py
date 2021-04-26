@@ -29,12 +29,15 @@ class GlossaryEntry:
             text = text[:-1]
         if not text.endswith("."):
             text += "."
+        if text.startswith("definitions"):
+            text = text.split("@")
+            text.pop(0)
         self.text = text
         self.formatted_name = formatted_name
         self.plural = plural
         self.alternate_name = alternate_name
         self.word_type = word_type
-        if ":" in self.word_type:
+        if self.word_type is not None and ":" in self.word_type:
             self.word_type = self.word_type.split(":")
         self.binomial = binomial
         self.stories = stories
@@ -122,6 +125,7 @@ class GlossaryEntry:
                 stories_dict[name] = story
         return stories_dict
 
+    # TODO: Sort see by order in "stories (unless there is a primary source?)"
     def see_to_html(self):
         """
         Generate html code to represent the See list.
@@ -194,7 +198,16 @@ class GlossaryEntry:
                                 html_str += f"{self.word_type[0]} {self.binomial}"
                 html_str += ")"
 
-            html_str += f":</b> {self.text} {self.see_to_html()}\n" \
+            text = ""
+            if type(self.text) is list:
+                text += self.text[0]
+                text += "<ul>"
+                for t in self.text[1:]:
+                    text += f"<li>{t}</li>"
+                text += "</ul>"
+            else:
+                text = self.text
+            html_str += f":</b> {text} {self.see_to_html()}\n" \
                         f"\t</li>\n\n"
         return html_str
 
@@ -220,7 +233,7 @@ class Glossary:
         self.parse_glossary()
 
         self.types = {}
-        self.count_types()
+        # self.count_types()
 
     def parse_story_table(self):
         self.stories = {}
