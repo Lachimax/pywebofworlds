@@ -15,6 +15,21 @@ def replace_all(string: str, replace: str, replace_with: str = ""):
     return string
 
 
+def generate_glossary_html(path_glossary: str,
+                           path_output: str = None,
+                           path_stories: str = None):
+    """
+    Wrapper function to convert glossary .csv to HTML, using a Glossary object.
+    @param path_glossary:
+    @param path_output:
+    @param path_stories:
+    @return:
+    """
+    glossary = Glossary(path=path_glossary, path_stories=path_stories)
+    glossary.write_html(path_output)
+    return glossary
+
+
 # TODO: Comment!!!
 # TODO: Catch bad story list entries.
 
@@ -221,22 +236,23 @@ class GlossaryEntry:
 # TODO: auto-hyperlinking within file;
 
 class Glossary:
-    def __init__(self, path: str, story_path: str = None):
+    def __init__(self, path: str, path_stories: str = None):
 
         if os.path.isdir(path):
             self.filename_csv = "glossary.csv"
-            glossary_path = path
+            path_glossary = path
         else:
-            glossary_path, self.filename_csv = os.path.split(path)
+            path_glossary, self.filename_csv = os.path.split(path)
 
-        if story_path is None:
-            story_path = os.path.join(glossary_path, "stories.csv")
-        elif os.path.isdir(story_path):
-            story_path = os.path.join(story_path, "stories.csv")
+        if path_stories is None:
+            path_stories = os.path.join(path_glossary, "stories.csv")
+        elif os.path.isdir(path_stories):
+            path_stories = os.path.join(path_stories, "stories.csv")
 
-        self.glossary_table = table.Table.read(os.path.join(glossary_path, self.filename_csv), format="ascii.csv", encoding="utf-8")
+        self.glossary_table = table.Table.read(os.path.join(path_glossary, self.filename_csv), format="ascii.csv",
+                                               encoding="utf-8")
         self.glossary_table.sort('name')
-        self.story_table = table.Table.read(story_path, format="ascii.csv", encoding="utf-16")
+        self.story_table = table.Table.read(path_stories, format="ascii.csv", encoding="utf-16")
 
         self.stories = {}
         self.parse_story_table()
