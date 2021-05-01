@@ -221,11 +221,20 @@ class GlossaryEntry:
 # TODO: auto-hyperlinking within file;
 
 class Glossary:
-    def __init__(self, path: str):
-        story_path = os.path.join(path, "stories.csv")
-        glossary_path = os.path.join(path, "glossary.csv")
+    def __init__(self, path: str, story_path: str = None):
 
-        self.glossary_table = table.Table.read(glossary_path, format="ascii.csv", encoding="utf-8")
+        if os.path.isdir(path):
+            self.filename_csv = "glossary.csv"
+            glossary_path = path
+        else:
+            glossary_path, self.filename_csv = os.path.split(path)
+
+        if story_path is None:
+            story_path = os.path.join(glossary_path, "stories.csv")
+        elif os.path.isdir(story_path):
+            story_path = os.path.join(story_path, "stories.csv")
+
+        self.glossary_table = table.Table.read(os.path.join(glossary_path, self.filename_csv), format="ascii.csv", encoding="utf-8")
         self.glossary_table.sort('name')
         self.story_table = table.Table.read(story_path, format="ascii.csv", encoding="utf-16")
 
