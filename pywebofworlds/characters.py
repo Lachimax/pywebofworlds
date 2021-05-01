@@ -1,8 +1,8 @@
 import random as r
 import timelines as t
+import utils as u
 import numpy as np
 from typing import Union, Iterable, List
-from astropy import table as tbl
 
 
 # TODO: Account for mixed ethnicities
@@ -16,6 +16,8 @@ from astropy import table as tbl
 
 # TODO: Maybe implement a class for location, incorporating date systems, demographics etc - maybe integrate with maps
 #   module.
+
+# TODO: Name generator (from list from file)
 
 class DemographicSet:
     """An object containing a set of mutually exclusive demographics, ideally adding to 100%. Each set contains one
@@ -49,10 +51,10 @@ class DemographicSet:
         self.demographics[key] = value
 
     def __str__(self):
-        string = ''
-        string += str(self.trait) + '\n'
+        string = 'Trait: ' + str(self.trait) + '\n'
         for name in self.demographics:
-            string += self.demographics[name]
+            string += name + ': ' + str(self.demographics[name]) + '\n'
+        return string
 
     def __len__(self):
         return len(self.demographics.keys())
@@ -92,6 +94,34 @@ class DemographicSet:
         delta = 100 - total
 
         return not abs(delta) > tolerance, total
+
+    def write_to_file(self, path: str):
+        """
+        Writes the DemographicList to a .csv file.
+        :param path: Path of file, including name.
+        :return:
+        """
+        rows = []
+        for group in self.demographics:
+            rows.append(group + ',' + str(self.demographics[group]))
+        u.write_wow_csv(path=path,
+                        header='DemographicSet,Trait:,' + self.trait,
+                        names=['Group:', 'Percentage:'],
+                        rows=rows)
+
+    def read_from_file(self, path: str):
+        """
+        Reads the DemographicList from a .csv file.
+        :param path: Path of file, including name.
+        :return:
+        """
+        header, names, rows = u.read_wow_csv(path=path, dtype=[str, float])
+        self.trait = header[2]
+        demographics = {}
+        for row in rows:
+            demographics[row[0]] = row[1]
+        self.add_demographics(demographics=demographics)
+
 
 # Default DemographicSets based on Earth, 2016
 sexes2016 = DemographicSet(trait='Sex',
@@ -140,7 +170,7 @@ class Character:
     def __setitem__(self, key: str, value):
         self.traits[key] = value
 
-    def det_dob(self, year, system: str = 'Julian', sigma: float = 34.):
+    def det_dob(self, year, system: str = 'Gregorian', sigma: float = 34.):
         """
         Generate a date-of-birth, assuming the distribution of age is a Gaussian.
         :param year: Year of current setting.
@@ -177,9 +207,9 @@ class Character:
         demographic_set.check_sum()
 
         population = []
-        for name in demographic_set:
+        for name in demographic_set.demographics:
             # TODO: This will only work to the nearest percent. Find a way around that?
-            for j in range(np.round(100 * demographic_set[name])):
+            for j in range(int(np.round(100 * demographic_set[name]))):
                 population.append(name)
 
         self[trait] = r.choice(population)
@@ -191,8 +221,10 @@ class CharacterList:
                  demographics_list: Iterable = demographics2016):
 
         if characters is None:
-            self.characters = []
+            characters = []
+
         if type(characters) is str:
+            self.characters = []
             self.read_from_file(path=characters)
         elif type(characters) is list:
             # TODO: Sanitise types in list
@@ -201,14 +233,16 @@ class CharacterList:
             raise TypeError('characters must be list or str.')
 
         self.demographics_list = {}
-        if demographics_list is None:
+        if demographics_list is not None:
             for demographic_set in demographics_list:
                 self.add_demographic_set(demographic_set)
 
         self.date = t.Date(year=year)
         self.location = location
         if self.location == 'Earth':
-            self.system = 'Julian'
+            self.system = 'Gregorian'
+        else:
+            self.system = None
 
     def __getitem__(self, item):
         return self.characters[item]
@@ -220,7 +254,9 @@ class CharacterList:
         return len(self.characters)
 
     def __str__(self):
-        string = ""
+        string = f"Date: {self.date}\n"
+        string += f"Date System: {self.system}\n"
+        string += f"Location: {self.location}\n"
         for i in range(len(self)):
             string += str(i) + ' ' + str(self.characters[i])
         return string
@@ -264,6 +300,8 @@ class CharacterList:
             self.add_character(character=character)
         return character
 
+    # TODO: Method for propagating and assigning a new trait, from demographic, to existing characters.
+
     def random_character(self):
         """
         Return a random Character from the CharacterList.
@@ -271,13 +309,22 @@ class CharacterList:
         """
         return r.choice(self.characters)
 
-    def populate(self, num: int):
+    def add_characters(self, num: int):
         """
         Adds num randomly generated Characters (using self.gen_char()) to the CharacterList.
-        :param num: Number of Characters to add.
+        :param population: Number of Characters to add.
         """
         for i in range(num):
             self.generate_character(add=True)
+
+    def populate(self, population: int):
+        """
+        Adds or removes characters to match population.
+        Characters with used==True are immune to removal.
+        :param population:
+        :return:
+        """
+
 
     def depopulate(self):
         """
@@ -287,6 +334,13 @@ class CharacterList:
         for character in self.characters:
             if not character.used:
                 self.characters.remove(character)
+
+    def repopulate(self, num: int):
+        """
+        Adds num randomly generated Characters to the CharacterList, taking the existing
+        characters into account.
+        :return:
+        """
 
     def sort_by_trait(self, trait: str):
         """
@@ -327,67 +381,48 @@ class CharacterList:
 
         return lst
 
+    # TODO: Read/write associated demographic sets along with the character list
+
+    def write_to_file(self, path: str):
+        """
+        Writes the DemographicList to a .csv file.
+        :param path: Path of file, including name.
+        :return:
+        """
+        rows = []
+        names = ['No.:', 'Name:', 'Used:', 'D.O.B.:']
+        for trait in self.demographics_list:
+            names.append(trait + ':')
+        for i, char in enumerate(self.characters):
+            row = f'{i},{char.name},{char.used},{char.dob}'
+            for trait in char.traits:
+                row += ',' + char[trait]
+            rows.append(row)
+
+        header = 'CharacterList,'
+        header += f"Date:,{self.date},"
+        header += f"Date System:,{self.system},"
+        header += f"Location:,{self.location},"
+
+        u.write_wow_csv(path=path,
+                        header=header,
+                        names=names,
+                        rows=rows)
+
     def read_from_file(self, path: str):
         """
-        Loads a saved character list from a csv file.
-        :param path: Path to csv file.
+        Reads the DemographicList from a .csv file.
+        :param path: Path of file, including name.
+        :return:
         """
-        chars = np.genfromtxt(path, dtype=None, names=True)
-        for i in chars['No']:
+        header, names, rows = u.read_wow_csv(path=path, dtype=[int, str, bool, str])
+        self.date = header[2]
+        self.system = header[4]
+        self.location = header[6]
+        for row in rows:
             char = Character()
-            if chars['DOB'][i] != b'None':
-                char.dob.str_to_date(chars['DOB'][i])
-            if chars['Ethnicity'][i] != b'None':
-                char.ethnicity = str(chars['Ethnicity'][i]).replace("b", "").replace("'", "")
-            if chars['Gender'][i] != b'None':
-                char.gender = str(chars['Gender'][i]).replace("b", "").replace("'", "")
-            if chars['Hand'][i] != b'None':
-                char.hand = str(chars['Hand'][i]).replace("b", "").replace("'", "")
-            if chars['Name'][i] != b'None':
-                char.name = str(chars['Name'][i]).replace("b", "").replace("'", "")
-            if chars['Religion'][i] != b'None':
-                char.religion = str(chars['Religion'][i]).replace("b", "").replace("'", "")
-            if chars['Sex'][i] != b'None':
-                char.sex = str(chars['Sex'][i]).replace("b", "").replace("'", "")
-            if chars['Sexuality'][i] != b'None':
-                char.sexuality = str(chars['Sexuality'][i]).replace("b", "").replace("'", "")
-            if chars['Species'][i] != b'None':
-                char.species = str(chars['Species'][i]).replace("b", "").replace("'", "")
-
-            if chars['Used'][i] == 1:
-                char.used = True
-            if chars['Used'][i] == 0:
-                char.used = False
-
-            self.characters.append(char)
-
-    def write_to_file(self, path):
-        """
-        Saves this character list to csv file.
-        :param path: Path of csv file to save.
-        """
-        output_values = np.zeros([len(self.characters), 11], dtype=(str, 24))
-        if path[-4:] != '.csv':
-            path += '.csv'
-
-        for i, chara in enumerate(self):
-            output_values[i, 0] = str(i)
-            output_values[i, 1] = str(chara.name)
-            output_values[i, 2] = str(chara.dob.show())
-            output_values[i, 3] = str(chara.species)
-            output_values[i, 4] = str(chara.sex)
-            output_values[i, 5] = str(chara.gender)
-            output_values[i, 6] = str(chara.ethnicity)
-            output_values[i, 7] = str(chara.hand)
-            output_values[i, 8] = str(chara.religion)
-            output_values[i, 9] = str(chara.sexuality)
-
-            if chara.used is False:
-                output_values[i, 10] = '0'
-            elif chara.used is True:
-                output_values[i, 10] = '1'
-
-        np.savetxt(path + '.csv', output_values,
-                   fmt='%-6s,%-11s,%-11s,%-11s,%-8s,%-8s,%-11s,%-11s,%-11s,%-11s,%-1s',
-                   header='No.:,Name:,D.O.B.:,Species:,Sex:,Gender:,Ethnicity:,Hand:,Religion:,Sexuality:,Used:'
-                   )
+            char.used = row[2]
+            char.dob = t.Date(string=row[3])
+            for i in range(4, len(row)):
+                char[names[i]] = row[i]
+            self.add_character(character=char)

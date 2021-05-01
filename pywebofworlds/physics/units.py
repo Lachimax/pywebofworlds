@@ -78,11 +78,6 @@ def acceleration_from_m_s_2(acc: "float", units="g"):
 
 
 def acceleration_to_acceleration(acc: "float", frm: "str", to: "str"):
-    if frm not in acceleration_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in acceleration_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     acc = acceleration_to_m_s_2(acc, frm)
     return acceleration_from_m_s_2(acc, to)
 
@@ -129,11 +124,6 @@ def angle_from_radians(angle: "float", units: "str" = "degree"):
 
 
 def angle_to_angle(angle: "float", frm: "str", to: "str"):
-    if frm not in angle_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in angle_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     angle = angle_to_radians(angle, frm)
     return angle_from_radians(angle, to)
 
@@ -252,7 +242,7 @@ nmi = 1.852 * kilo
 # Earth radius
 R_E = 6.371e3
 
-length_units = {'m': 1., 'AU': AU, 'ly': ly, 'parsec': pc, 'pc': pc}
+length_units = {'m': 1., 'km': kilo, 'AU': AU, 'ly': ly, 'parsec': pc, 'pc': pc}
 
 
 def length_to_metre(length, units='AU'):
@@ -274,11 +264,6 @@ def length_from_metre(length, units='AU'):
 
 
 def length_to_length(length, frm='pc', to='ly'):
-    if frm not in length_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in length_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     length = length_to_metre(length, frm)
     return length_from_metre(length, to)
 
@@ -398,11 +383,6 @@ def mass_from_kg(mass, units='M_E'):
 
 
 def mass_to_mass(mass, frm='M_E', to='M_J'):
-    if frm not in mass_units:
-        raise ValueError(frm + ' is an unrecognised unit.')
-    if to not in mass_units:
-        raise ValueError(to + ' is an unrecognised unit.')
-
     mass = mass_to_kg(mass, frm)
     return mass_from_kg(mass, to)
 
@@ -451,7 +431,7 @@ yr_Gregorian = 365.3435 * day
 # year, hence leap years.
 yr_orbital = 1.00001742096 * yr
 
-time_units = {"s": 1., "yr": yr}
+time_units = {"s": 1., "yr": yr, "hr": hr}
 
 
 def time_from_sec(time, units='yr'):
@@ -472,6 +452,11 @@ def time_to_sec(time, units='yr'):
     return time * factor
 
 
+def time_to_time(time, frm: str = 's', to: str = 'kph'):
+    time = time_from_sec(time, frm)
+    return time_to_sec(time, to)
+
+
 # VELOCITY (in metres/second [m/s])
 
 # Speed of sound in air
@@ -483,7 +468,7 @@ kph = kilo / hr
 # US miles per hour (mph)
 mph = mi / hr
 
-vel_units = {"m_s": 1., "c": c}
+vel_units = {"m_s": 1., "c": c, "kph": kph, "mph": mph}
 
 
 def velocity_from_m_s(v, units='c'):
@@ -502,3 +487,8 @@ def velocity_to_m_s(v, units='c'):
     factor = vel_units[units]
 
     return v * factor
+
+
+def velocity_to_velocity(velocity, frm: str = 'mph', to: str = 'kph'):
+    velocity = velocity_from_m_s(velocity, frm)
+    return velocity_to_m_s(velocity, to)

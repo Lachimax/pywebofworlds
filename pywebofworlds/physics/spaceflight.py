@@ -1,8 +1,6 @@
-import physics.units as u
-import physics.astrophysics as a
-import physics.relativity as r
+from src.pywebofworlds import physics as u, physics as a, physics as m
+import pywebofworlds.physics.relativity as r
 import math
-import physics.maths as m
 import matplotlib.pyplot as plt
 import numpy as np
 from queue import *
