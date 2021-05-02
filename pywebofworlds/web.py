@@ -15,6 +15,21 @@ def replace_all(string: str, replace: str, replace_with: str = ""):
     return string
 
 
+def generate_glossary_html(path_glossary: str,
+                           path_output: str = None,
+                           path_stories: str = None):
+    """
+    Wrapper function to convert glossary .csv to HTML, using a Glossary object.
+    @param path_glossary:
+    @param path_output:
+    @param path_stories:
+    @return:
+    """
+    glossary = Glossary(path=path_glossary, path_stories=path_stories)
+    glossary.write_html(path_output)
+    return glossary
+
+
 # TODO: Comment!!!
 # TODO: Catch bad story list entries.
 
@@ -148,18 +163,18 @@ class GlossaryEntry:
                     series_title = series_entry['title']
                     url = series_entry['url']
                     if len(story_entry) == 0:
-                        story_html += f'\t\t\t\t<a href="{url}"><i>{series_title}</i></a>\n'
+                        story_html += f'\t\t\t\t<a href="{url}" target="_blank"><i>{series_title}</i></a>\n'
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
-                        story_html += f'\t\t\t\t<a href="{story_entry[0]["url"]}"><i>{series_title}</i> - {story_entry[0]["title"]}</a>\n'
+                        story_html += f'\t\t\t\t<a href="{story_entry[0]["url"]}" target="_blank"><i>{series_title}</i> - {story_entry[0]["title"]}</a>\n'
                     else:
                         story_html += \
-                            f"\t\t\t\t<i><a href='{url}'>{series_title}</a></i>\n" \
+                            f"\t\t\t\t<i><a href='{url}' target='_blank'>{series_title}</a></i>\n" \
                             f"\t\t\t\t<ul>\n"
                         for sub_story_entry in story_entry:
-                            story_html += f'\t\t\t\t\t<li><a href="{sub_story_entry["url"]}">{sub_story_entry["title"]}</a></li>\n'
+                            story_html += f'\t\t\t\t\t<li><a href="{sub_story_entry["url"]}" target="_blank">{sub_story_entry["title"]}</a></li>\n'
                         story_html += "\t\t\t\t</ul>\n"
                 else:
-                    story_html += f'\t\t<i><a href="{story_entry["url"]}">{story_entry["title"]}</a></i>\n'
+                    story_html += f'\t\t<i><a href="{story_entry["url"]}" target="_blank">{story_entry["title"]}</a></i>\n'
 
                 story_html += "\t\t\t</li>\n"
                 html_str += story_html
@@ -222,13 +237,23 @@ class GlossaryEntry:
 # TODO: auto-hyperlinking within file;
 
 class Glossary:
-    def __init__(self, path: str):
-        story_path = os.path.join(path, "stories.csv")
-        glossary_path = os.path.join(path, "glossary.csv")
+    def __init__(self, path: str, path_stories: str = None):
 
-        self.glossary_table = table.Table.read(glossary_path, format="ascii.csv", encoding="utf-8")
+        if os.path.isdir(path):
+            self.filename_csv = "glossary.csv"
+            path_glossary = path
+        else:
+            path_glossary, self.filename_csv = os.path.split(path)
+
+        if path_stories is None:
+            path_stories = os.path.join(path_glossary, "stories.csv")
+        elif os.path.isdir(path_stories):
+            path_stories = os.path.join(path_stories, "stories.csv")
+
+        self.glossary_table = table.Table.read(os.path.join(path_glossary, self.filename_csv), format="ascii.csv",
+                                               encoding="utf-8")
         self.glossary_table.sort('name')
-        self.story_table = table.Table.read(story_path, format="ascii.csv", encoding="utf-16")
+        self.story_table = table.Table.read(path_stories, format="ascii.csv", encoding="utf-16")
 
         self.stories = {}
         self.parse_story_table()
