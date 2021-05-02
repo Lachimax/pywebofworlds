@@ -65,6 +65,7 @@ class GlossaryEntry:
         binomial = None
         if row["binomial"] not in na_vals:
             binomial = row["binomial"]
+            binomial = binomial.replace(binomial[0], binomial[0].upper(), 1)
         if row["mask"] in na_vals or row["mask"] == "FALSE":
             mask = False
         else:
