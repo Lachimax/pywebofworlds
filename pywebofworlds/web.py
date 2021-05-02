@@ -162,18 +162,18 @@ class GlossaryEntry:
                     series_title = series_entry['title']
                     url = series_entry['url']
                     if len(story_entry) == 0:
-                        story_html += f'\t\t\t\t<a href="{url}"><i>{series_title}</i></a>\n'
+                        story_html += f'\t\t\t\t<a href="{url}" target="_blank"><i>{series_title}</i></a>\n'
                     if len(story_entry) == 1 and not story_entry[0]["mask"]:
-                        story_html += f'\t\t\t\t<a href="{story_entry[0]["url"]}"><i>{series_title}</i> - {story_entry[0]["title"]}</a>\n'
+                        story_html += f'\t\t\t\t<a href="{story_entry[0]["url"]}" target="_blank"><i>{series_title}</i> - {story_entry[0]["title"]}</a>\n'
                     else:
                         story_html += \
-                            f"\t\t\t\t<i><a href='{url}'>{series_title}</a></i>\n" \
+                            f"\t\t\t\t<i><a href='{url}' target='_blank'>{series_title}</a></i>\n" \
                             f"\t\t\t\t<ul>\n"
                         for sub_story_entry in story_entry:
-                            story_html += f'\t\t\t\t\t<li><a href="{sub_story_entry["url"]}">{sub_story_entry["title"]}</a></li>\n'
+                            story_html += f'\t\t\t\t\t<li><a href="{sub_story_entry["url"]}" target="_blank">{sub_story_entry["title"]}</a></li>\n'
                         story_html += "\t\t\t\t</ul>\n"
                 else:
-                    story_html += f'\t\t<i><a href="{story_entry["url"]}">{story_entry["title"]}</a></i>\n'
+                    story_html += f'\t\t<i><a href="{story_entry["url"]}" target="_blank">{story_entry["title"]}</a></i>\n'
 
                 story_html += "\t\t\t</li>\n"
                 html_str += story_html
