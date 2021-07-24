@@ -240,20 +240,6 @@ def find_year(year, arr):
     return index
 
 
-def line_func(x1, y1, x2, y2):
-    """ Given two points, calculates the gradient and y-intercept of the line joining them.
-
-    :param x1: x-coordinate of first point
-    :param y1: y-coordinate of first point
-    :param x2: x-coordinate of second point
-    :param y2: y-coordinate of second point
-    :return: (tuple) Contains the gradient of the line at [0] and the y-intercept at [1], ie (m, b).
-    """
-    m = (y2 - y1) / (x2 - x1)
-    b = y1 - m * x1
-    return m, b
-
-
 def switch_year0(year0, yr_old, yr_new):
     """
     For obtaining Year 0 of system 1 in system 2, knowing Year 0 of system 2 in system 1

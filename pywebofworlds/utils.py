@@ -1,8 +1,22 @@
 from typing import List, Union
-import math as m
+import math
 
 
 # TODO: Standardise handling of CSV files using built in csv reader/writer
+
+def line_func(x1, y1, x2, y2):
+    """ Given two points, calculates the gradient and y-intercept of the line joining them.
+
+    :param x1: x-coordinate of first point
+    :param y1: y-coordinate of first point
+    :param x2: x-coordinate of second point
+    :param y2: y-coordinate of second point
+    :return: (tuple) Contains the gradient of the line at [0] and the y-intercept at [1], ie (m, b).
+    """
+    m = (y2 - y1) / (x2 - x1)
+    b = y1 - m * x1
+    return m, b
+
 
 def leading_zeroes(n, digits=2):
     """
@@ -24,7 +38,7 @@ def leading_zeroes(n, digits=2):
                 n = -n
             else:
                 lead = ""
-            n_digits = int(m.log10(n)) + 1
+            n_digits = int(math.log10(n)) + 1
         # Calculate the number of leading zeroes needed.
         zeroes = digits - n_digits
         # Append that number of zeroes
