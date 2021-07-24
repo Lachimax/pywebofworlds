@@ -1,5 +1,5 @@
 import numpy as np
-import utils as u
+import pywebofworlds.utils as u
 from typing import Union
 
 
