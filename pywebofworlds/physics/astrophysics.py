@@ -30,7 +30,6 @@ import sys
 # TODO: radius-mass relation
 # TODO: Nightsky projection
 # TODO: generate solar system
-# TODO: Titius-Bode Law
 
 # TODO: Example scripts
 # TODO: Method for reading in exoplanet catalogue. Try to match names, alternate names, then ra & dec

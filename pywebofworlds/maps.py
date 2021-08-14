@@ -17,9 +17,9 @@ import imageio
 from astropy import units as un
 import astropy.table as tbl
 
+
 # TODO: Interact directly with SVG?
-# TODO: Journey class; interact with date system in timelines
-# Insert function (work like list)
+# TODO: Stop using basemap and move onto cartopy.
 
 def check_basemap():
     if not bmap_available:
@@ -244,25 +244,25 @@ class Location:
         if type(speed) is not un.Quantity:
             speed = speed * un.km / un.hour
         else:
-            speed = speed.to(un.km / un.hour)  # u.velocity_to_velocity(velocity=speed, frm=units, to='kph')
+            speed = speed.to(un.km / un.hour)
         time = self.travel_time(other=other, speed=speed, units=units)
         if type(time_per_day) is not un.Quantity:
             time_per_day = time_per_day * un.hour / un.day
         else:
-            time_per_day = time_per_day.to(un.hour / un.day)  # u.time_to_sec(time=time_per_day, units="hr")
+            time_per_day = time_per_day.to(un.hour / un.day)
         days = time / time_per_day
         return days.to(un.day)
 
-    def travel_days_dpd(self, other, distance_per_day: float = 30., units: str = "km"):
+    def travel_days_dpd(self, other: 'Location', distance_per_day: un.Quantity = 30 * un.km):
         """
-
-        :param other:
+        An alternate method for calculating the number of days to travel to another location, by specifying the amount
+        of distance covered in a single day.
+        :param other: Other Location.
         :param distance_per_day:
-        :param units:
         :return:
         """
         distance = self.distance_to(other)
-        distance_per_day = u.length_to_metre(length=distance_per_day, units=units)
+        distance_per_day = distance_per_day.to(un.km)
         days = distance / distance_per_day
         return days
 
@@ -413,6 +413,7 @@ class JourneyLocation:
 
 
 class Journey:
+    # TODO: interact with date system in timelines
     def __init__(self, locations: List[Location]):
         self.locations = []
         self.legs = []
