@@ -17,9 +17,6 @@ import imageio
 from astropy import units as un
 import astropy.table as tbl
 
-from pywebofworlds.physics import units as u
-
-
 # TODO: Interact directly with SVG?
 # TODO: Journey class; interact with date system in timelines
 # Insert function (work like list)
@@ -232,7 +229,6 @@ class Location:
         if speed is not un.Quantity:
             speed = un.Quantity(speed, units)
         distance = self.distance_to(other)
-        # u.velocity_to_m_s(v=speed, units=units)
         time = distance / speed
         return time
 
