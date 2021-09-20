@@ -286,8 +286,22 @@ class Glossary:
             self.glossary[entry.name] = entry
         return self.glossary
 
-    def to_html(self):
-        html_str = "<ul>\n"
+    def to_html(self, add_format_header: bool = True):
+
+        if add_format_header:
+            html_str = """<style>
+    ul {
+        margin: 0px;
+    }
+    ul li {
+        margin: 0px;
+    }
+</style>
+"""
+        else:
+            html_str = ""
+
+        html_str += "<ul>\n"
         for entry in self.glossary:
             html_str += self[entry].to_html()
         html_str += "</ul>"
