@@ -1,12 +1,12 @@
 from typing import List, Union
 import csv
-import utils
+import pywebofworlds.utils as utils
 from matplotlib import pyplot as plt
-from tree import draw_tree_line
+from pywebofworlds.tree import draw_tree_line
 import matplotlib.colors as mcolors
 
 empty_strings = ['', ' ', None, 'None']
-starting_colours = ['red', 'blue', 'green']
+starting_colours = ['red', 'blue', 'green', 'cyan']
 
 
 # TODO: Writing ancestors to CSV is redundant
