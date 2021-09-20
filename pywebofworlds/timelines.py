@@ -1,7 +1,7 @@
 import numpy as np
-import pywebofworlds.utils as u
 from typing import Union
 
+import pywebofworlds.utils as u
 
 class DateSystem:
     def __init__(self, year: float, year0: float, months: Union[list, dict] = None, month_lengths: list = None,

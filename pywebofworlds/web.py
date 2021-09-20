@@ -4,7 +4,7 @@ from typing import List
 from astropy import table
 from numpy.ma import masked
 
-from pywebofworlds import utils as u
+import pywebofworlds.utils as u
 
 na_vals = ["", None, masked]
 

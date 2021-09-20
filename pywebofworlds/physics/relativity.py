@@ -1,5 +1,6 @@
-from src.pywebofworlds import physics as u
 import math
+
+import pywebofworlds.utils as u
 
 c = u.c
 
@@ -13,7 +14,7 @@ def gamma(v):
     """
     if (v >= 0) & (v < c):
         v = float(v)
-        return (math.sqrt(1-(v/c)**2))**-1
+        return (math.sqrt(1 - (v / c) ** 2)) ** -1
 
     else:
         raise ValueError('v must be less than the speed of light')

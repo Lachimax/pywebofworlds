@@ -1,8 +1,9 @@
 import random as r
-import timelines as t
-import utils as u
 import numpy as np
 from typing import Union, Iterable, List
+
+import pywebofworlds.timelines as t
+import pywebofworlds.utils as u
 
 
 # TODO: Account for mixed ethnicities

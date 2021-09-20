@@ -1,9 +1,11 @@
 from typing import List, Union
 import csv
-import pywebofworlds.utils as utils
-from matplotlib import pyplot as plt
-from pywebofworlds.tree import draw_tree_line
+
+import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+
+import pywebofworlds.utils as utils
+from pywebofworlds.tree import draw_tree_line
 
 empty_strings = ['', ' ', None, 'None']
 starting_colours = ['red', 'blue', 'green', 'cyan']
