@@ -19,6 +19,7 @@ import astropy.units as u
 
 import pywebofworlds.physics.maths as ma
 
+# TODO: properly switch to astropy units.
 
 # from queue import PriorityQueue
 
