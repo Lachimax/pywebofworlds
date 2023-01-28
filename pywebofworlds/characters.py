@@ -4,6 +4,7 @@ from typing import Union, Iterable, List
 
 import pywebofworlds.timelines as t
 import pywebofworlds.utils as u
+import pywebofworlds.biology.species as species
 
 
 # TODO: Account for mixed ethnicities
@@ -154,6 +155,8 @@ class Character:
         self.children = list()
         self.traits = {}
         self.used = False
+
+        self.species: species.Species = None
 
     def __str__(self):
         string = ''

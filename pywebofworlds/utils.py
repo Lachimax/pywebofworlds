@@ -1,6 +1,9 @@
+import os
 from typing import List, Union
-import math as m
+import math
+
 import astropy.units as units
+import astropy.io.misc.yaml as yaml
 
 
 # TODO: Standardise handling of CSV files using built in csv reader/writer
@@ -202,3 +205,27 @@ def check_quantity(
         elif convert:
             number = number.to(unit)
     return number
+
+
+def load_params(file: str):
+    file = sanitise_file_ext(file, '.yaml')
+
+    print('Loading parameter file from ' + str(file))
+
+    if os.path.isfile(file):
+        with open(file) as f:
+            p = yaml.load(f)
+    else:
+        p = None
+        print('No parameter file found at', str(file) + ', returning None.')
+    return p
+
+
+def save_params(file: str, dictionary: dict):
+    file = sanitise_file_ext(path=file, ext=".yaml")
+
+    print('Saving parameter file to ' + str(file))
+    print("params.save_params: dictionary ==", dictionary)
+
+    with open(file, 'w') as f:
+        yaml.dump(dictionary, f)
