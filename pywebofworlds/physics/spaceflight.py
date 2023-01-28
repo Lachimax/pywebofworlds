@@ -458,8 +458,8 @@ class WormholeGraph:
             wh_str = ""
             print("Writing wormholes from: " + str(wh.star.idn) + ": " + wh.star.name)
             for other in wh:
-                print("   To " + str(other.star.idn) + ": " + other.star.name)
-                wh_str += str(other.star.idn) + "; "
+                print("   To " + str(other.orbiting.idn) + ": " + other.orbiting.name)
+                wh_str += str(other.orbiting.idn) + "; "
             wh.star.wormholes_to = wh_str
         print("Finished writing wormholes to StarList")
 
@@ -467,7 +467,7 @@ class WormholeGraph:
         if type(vertex) is WormholeVertex:
             self.vertex_list.append(vertex)
             self.size += 1
-            ssn = vertex.star
+            ssn = vertex.orbiting
             print(
                 "   " + str(self.size) + " To " + str(
                     ssn.idn) + ": Name: " + ssn.name + "; Time: " + str(vertex.time))
@@ -486,7 +486,7 @@ class WormholeGraph:
         """
 
         for wh in self.vertex_list:
-            if wh.star is star:
+            if wh.orbiting is star:
                 if time is not None and wh.time > time:
                     wh.time = time
                 return wh, True
@@ -518,7 +518,7 @@ class WormholeGraph:
 
         for v in self.vertex_list:
 
-            s = v.star
+            s = v.orbiting
             print("Plotting " + str(s.idn) + ": " + s.name)
 
             ax.scatter(xs=s.x, ys=s.y, zs=s.z, c=colour, s=4)
@@ -533,7 +533,7 @@ class WormholeGraph:
             print("Plotting wormholes from " + str(s.idn) + ": " + s.name)
 
             for j in v.wormholes:
-                ssw = j.star
+                ssw = j.orbiting
                 print("   To " + str(ssw.idn) + ": " + ssw.name)
                 ax.plot(xs=[ssw.x, s.x], ys=[ssw.y, s.y], zs=[ssw.z, s.z], c=colour)
 
@@ -550,7 +550,7 @@ class WormholeGraph:
             wormholes = a.StarList()
             for wh in self:
                 wormholes.add_star(wh.star)
-            nrst, dist = wormholes.find_nearest_neighbour(wormhole.star)
+            nrst, dist = wormholes.find_nearest_neighbour(wormhole.orbiting)
             return self.check_for_vertex(nrst, None)[0], dist
         else:
             raise ValueError("wormhole must be of type WormholeVertex")
@@ -558,7 +558,7 @@ class WormholeGraph:
     def find_wormhole(self, name: "str"):
         if type(name) is str:
             for wh in self.vertex_list:
-                if wh.star.name == name:
+                if wh.orbiting.name == name:
                     return wh
 
             return None

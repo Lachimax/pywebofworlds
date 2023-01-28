@@ -9,19 +9,19 @@ Within each class of object, some of its traits can be calculated. For example, 
 be calculated from its mass using star.ms_luminosity().
 """
 
+import sys
+import math
+
 import numpy as np
 import numpy.random as r
-import math
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
-import astropy.units as u
 
-import pywebofworlds.physics.maths as ma
+import astropy.units as units
+import astropy.constants as constants
 
-# TODO: properly switch to astropy units.
-
-# from queue import PriorityQueue
+from pywebofworlds.physics import maths as ma
+import pywebofworlds.utils as utils
 
 
 # Possible model for distribution of moons: standard deviation (of sma) proportional to mass of host planet
@@ -35,6 +35,61 @@ import pywebofworlds.physics.maths as ma
 
 # TODO: Example scripts
 # TODO: Method for reading in exoplanet catalogue. Try to match names, alternate names, then ra & dec
+
+class Object:
+    def __init__(
+            self,
+            **kwargs
+    ):
+        self.orbiting: Object = None
+        if "orbiting" in kwargs and isinstance(kwargs["orbiting"], Object):
+            self.orbiting = kwargs["orbiting"]
+
+        self.name: str = None
+        if "name" in kwargs:
+            self.name = str(kwargs["name"])
+        self.idn: str = None
+        if "idn" in kwargs:
+            self.idn = str(kwargs["idn"])
+
+        self.mass: units.Quantity = None
+        if "mass" in kwargs:
+            self.mass = utils.check_quantity(
+                kwargs["mass"],
+                unit=units.kg
+            )
+        self.radius: units.Quantity = None
+        if "radius" in kwargs:
+            self.radius = utils.check_quantity(
+                kwargs["radius"],
+                unit=units.m
+            )
+
+        self.sma: units.Quantity = None
+        if "sma" in kwargs:
+            self.sma = utils.check_quantity(
+                kwargs["sma"],
+                unit=units.m
+            )
+        self.period: float = None  # Orbital period
+        if "period" in kwargs:
+            self.period = utils.check_quantity(
+                kwargs["period"],
+                unit=units.s
+            )
+
+    def det_orbit(self):
+        try:
+            pi = math.pi
+            a = utils.check_quantity(self.sma, unit=units.au)
+            G = constants.G
+            M = self.orbiting.mass
+
+            T = 2 * pi * math.sqrt((a ** 3.) / (G * M))  # in seconds
+            self.period = T.to(units.yr)  # convert to years
+        except TypeError:
+            print("Some of your values are None. Make sure star and sma are assigned correctly.")
+
 
 class StarList:
     """
@@ -904,10 +959,13 @@ class StarList:
         self.read_all(path + "SF_Cat_Moons_" + ver, path + "SF_Cat_Planets_" + ver, path + "SF_Cat_Stars_" + ver,
                       path + "SF_Cat_StarSystems_" + ver)
 
-    def read_hyg(self,
-                 path: "str" = "C:\\Users\\Lachlan\\Google Drive\\Projects\\Python\\physics\\astronomy\\hygdata_LM.xlsx"):
+    def read_hyg(
+            self,
+            path: str
+    ):
         """
         Imports the StarList from a (properly formatted) .xlsx file version of HYG database.
+
         :param path: str:
         :return:
         """
@@ -931,7 +989,7 @@ class StarList:
             star.proper = str(row[6])
             star.asc = float(row[7])
             star.dec = float(row[8])
-            star.distance = u.length_to_length(row[9], 'pc', 'ly')
+            star.distance = float(row[9]) * units.pc
             star.pmra = float(row[10])
             star.pmdec = float(row[11])
             star.rv = float(row[12])
@@ -939,12 +997,12 @@ class StarList:
             star.abs_mag = float(row[14])
             star.spec_type = str(row[15])
             star.ci = float(row[16])
-            star.x = u.length_to_length(float(row[17]), 'pc', 'ly')
-            star.y = u.length_to_length(float(row[18]), 'pc', 'ly')
-            star.z = u.length_to_length(float(row[19]), 'pc', 'ly')
-            star.vx = u.length_to_length(float(row[20]), 'pc', 'ly')
-            star.vy = u.length_to_length(float(row[21]), 'pc', 'ly')
-            star.vz = u.length_to_length(float(row[22]), 'pc', 'ly')
+            star.x = float(row[17]) * units.pc
+            star.y = float(row[18]) * units.pc
+            star.z = float(row[19]) * units.pc
+            star.vx = float(row[20]) * units.pc / units.yr
+            star.vy = float(row[21]) * units.pc / units.yr
+            star.vz = float(row[22]) * units.pc / units.yr
             star.rarad = float(row[23])
             star.decrad = float(row[24])
             star.pmrarad = float(row[25])
@@ -1138,7 +1196,7 @@ class StarList:
             planet = Planet()
 
             planet.name = str(row[0])
-            planet.mass = u.mass_to_mass(float(row[2]), frm="M_J", to="M_E")
+            planet.mass = float(row[2]) * units.jupiterMass
             planet.radius = float(row[8])
             planet.period = float(row[11])
             planet.sma = float(row[14])
@@ -1787,7 +1845,7 @@ class StarSystem:
             num = r.randint(0, 100)
 
 
-class Star:
+class Star(Object):
     """
     Variables such as luminosity and habitable zone are approximations valid only on the main sequence.
     Attributes:
@@ -1799,15 +1857,16 @@ class Star:
         temp_eff: effective temperature of the star
     """
 
-    def __init__(self, name=None, mass=None, create=False):
+    def __init__(
+            self,
+            create: bool = False,
+            **kwargs,
+    ):
+
+        super().__init__(**kwargs)
 
         # Names and IDs
-        if name is not None:
-            self.name = str(name)
-        else:
-            self.name = None
         self.names: "list" = []
-        self.idn: "int" = None
         self.hip: "int" = None  # HIP catalogue id
         self.hd: "int" = None  # HD catalogue id
         self.hr: "str" = None  # HR catalogue id
@@ -1853,11 +1912,6 @@ class Star:
         self.pmdecrad = None
 
         # Properties
-        if type(mass) is float:
-            self.mass = float(mass)
-        else:
-            self.mass = None
-        self.radius: "float" = None
         self.mag: "float" = None
         self.abs_mag: "float" = None
         self.spec_type: "str" = None
@@ -1881,7 +1935,6 @@ class Star:
         self.wormholes_to = ""
         self.hz_inner = None
         self.hz_outer = None
-        self.sma = None
 
         self.nearest_neighbour = None
         self.nearest_neighbour_d = None
@@ -1892,7 +1945,7 @@ class Star:
         self.visited = False
 
         if create is True:
-            if mass is None:
+            if self.mass is None:
                 self.recalculate(mass=True)
             else:
                 self.recalculate()
@@ -1988,7 +2041,7 @@ class Star:
 
     def add_planet(self, planet):
         if type(planet) is Planet:
-            planet.star = self
+            planet.orbiting = self
             planet.star_id = self.idn
             planet.star_name = self.name
             self.planets.append(planet)
@@ -2040,7 +2093,7 @@ class Star:
                     a = 3
 
 
-class Planet:
+class Planet(Object):
     """
     Attributes:
         mass: mass of the planet, in Earth masses
@@ -2048,10 +2101,13 @@ class Planet:
         sma: semi-major axis of the planet's orbit, in AU
     """
 
-    def __init__(self, mass=None, radius=None, name=None):
+    def __init__(
+            self,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
 
         # Exploration
-        self.name = name
         self.names = []
         self.political: "str" = ""  # Political information
         self.discovered: "int" = None  # Year discovered
@@ -2061,18 +2117,14 @@ class Planet:
 
         # Intrinsic properties
         self.type = ""
-        self.mass = mass  # Earth masses
-        self.radius = radius
         self.g = None
         self.temp: "float" = None  # Temperature, in K
         self.geometric_albedo: "float" = None  # Geometric albedo
         self.molecules: "str" = None  # Molecules observed
 
         # Orbital characteristics
-        self.period: "float" = None  # Orbital period, in days
         self.rot_period: "float" = None
-        self.sma: "float" = None  # Semi-major axis, in AU
-        self.eccentricity: "float" = None
+        self.eccentricity: float = None
         self.inclination: "float" = None  # Orbital inclination, in degrees
         self.omega: "float" = None  # Argument of periastron, in degrees
         self.semi_amplitude: "float" = None  # Semi-amplitude (I don't know what this means either)
@@ -2081,7 +2133,6 @@ class Planet:
         self.star_name = ""
         self.star_id = None
         self.local_id = None
-        self.star = Star()
 
         self.moons_str = ""
         self.moons = list()
@@ -2093,26 +2144,14 @@ class Planet:
         self.mass = 10. ** (logm)
 
     def surface_g(self):
-        return u.G * self.mass / self.radius ** 2
+        return constants.G * self.mass / self.radius ** 2
 
     def set_star(self, star):
-        self.star = star
-
-    def det_orbit(self):
-        try:
-            pi = math.pi
-            a = u.length_to_metre(self.sma, units='AU')
-            G = u.G
-            M = u.mass_to_kg(self.star.mass, units='M_sol')
-
-            T = 2 * pi * math.sqrt((a ** 3.) / (G * M))  # in seconds
-            self.period = u.time_from_sec(T, units='yr')  # convert to years
-        except TypeError:
-            print("Some of your values are None. Make sure star and sma are assigned correctly.")
+        self.orbiting = star
 
     def add_moon(self, moon):
         if type(moon) is Moon:
-            moon.planet = self
+            moon.orbiting = self
             self.moons.append(moon)
         else:
             raise TypeError('Argument must be of type astronomy.Moon')
@@ -2168,36 +2207,22 @@ class Planet:
         np.savetxt(title + '.txt', outputvalues, fmt='%-11s %-11s %-11s %-11s %-11s %-11s')
 
 
-class Moon:
-    def __init__(self, mass=None, radius=None, name=None, idn=None):
-        self.idn = idn
-        self.name = name
-        self.mass = mass  # In Earth masses
-        self.radius = radius
+class Moon(Object):
+    def __init__(
+            self,
+            idn=None,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+
         self.g = None
-        self.sma = None
-        self.period = None
-        self.planet = Planet()
-        self.planet_name: "str" = ""
-        self.planet_id: "int" = None
+        self.planet_name: str = ""
+        self.planet_id: int = None
         self.id_local = None
         self.political = ""
 
     def set_planet(self, planet):
-        self.planet = planet
-
-    def det_orbit(self):
-        try:
-            pi = math.pi
-            a = u.length_to_metre(self.sma, units='AU')
-            G = u.G
-            M = u.mass_to_kg(self.planet.mass, units='M_E')
-
-            T = 2 * pi * math.sqrt((a ** 3.) / (G * M))  # in seconds
-            self.period = u.time_from_sec(T, units='yr')  # convert to years
-
-        except TypeError:
-            print("Some of your values are None. Make sure star and sma are assigned correctly.")
+        self.orbiting = planet
 
     def show(self):
 
@@ -2223,7 +2248,8 @@ class Moon:
 def imf(mass):
     """
     Returns the frequency of a given mass under the initial mass function
-    # Star initial mass function and present-day mass function: https://arxiv.org/pdf/astro-ph/0304382.pdf
+    Star initial mass function and present-day mass function: https://arxiv.org/pdf/astro-ph/0304382.pdf
+
     :param mass: mass of star
     :return: frequency
     """
@@ -2236,7 +2262,8 @@ def imf(mass):
 def pdmf(mass):
     """
     Returns the frequency of a given mass under the present-day mass function
-    # Star initial mass function and present-day mass function: https://arxiv.org/pdf/astro-ph/0304382.pdf
+    Star initial mass function and present-day mass function: https://arxiv.org/pdf/astro-ph/0304382.pdf
+
     :param mass: mass of star
     :return:
     """
@@ -2300,39 +2327,6 @@ def distance_between(x1, y1, z1, x2, y2, z2):
     :return: Distance between points (x1,y1,z1) and (x2,y2,z2).
     '''
     return math.sqrt((x2 - x1) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2)
-
-
-def equ_to_cart(asc_hrs, asc_mins, asc_sec, dec_deg, dec_mins, dec_sec, distance):
-    """
-
-    Convert celestial coordinates of stars in the sky to Cartesian coordinates with Earth/Sun at the origin.
-
-    This cartesian system uses:
-        + x axis: towards dec=0, asc=0 (vernal equinox)
-        + y axis: towards dec=0, asc=6 hrs
-        + z axis: towards dec = 90 (north celestial pole)
-
-    :param asc_hrs: The hour component of the right ascension, in hours
-    :param asc_mins: The minute component of the right ascension, in minutes
-    :param asc_sec: The second component of the right ascension, in seconds
-    :param dec: Declination, in degrees
-    :param distance: Distance, in light years (or other units)
-    :return: numpy array of three Cartesian coordinates, x,y,z
-    """
-
-    # First convert right ascension to degrees
-
-    # For R.A., the entire thing is multiplied by 15
-    asc = u.angle_ra_to_radians(asc_hrs, asc_mins, asc_sec)
-    # asc = 15. * (float(asc_hrs) + (1. / 60.) * float(asc_mins) + (1. / 3600.) * float(asc_sec))
-    dec = u.angle_arc_to_decimal(dec_deg, dec_mins, dec_sec, radians=True)
-
-    # Now convert to Cartesian coordinates
-    x = float(distance) * math.cos(dec) * math.cos(asc)
-    y = float(distance) * math.cos(dec) * math.sin(asc)
-    z = float(distance) * math.sin(dec)
-
-    return x, y, z
 
 
 SolSystem = StarSystem(name='Sol System')

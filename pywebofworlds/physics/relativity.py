@@ -1,8 +1,8 @@
 import math
 
-import pywebofworlds.utils as u
+from astropy import units, constants
 
-c = u.c
+c = constants.c
 
 
 def gamma(v):

@@ -320,7 +320,7 @@ class Location:
         distance = self.distance_to(other)
         distance_per_day = distance_per_day.to(units.km)
         days = distance / distance_per_day
-        return days
+        return days.do(un.day)
 
 
 marker_colours = ['r', 'g', 'b']

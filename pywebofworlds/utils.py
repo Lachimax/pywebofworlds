@@ -1,5 +1,6 @@
 from typing import List, Union
-import math
+import math as m
+import astropy.units as units
 
 
 # TODO: Standardise handling of CSV files using built in csv reader/writer
@@ -163,3 +164,41 @@ def split_string(string: str, delimiter: str = ';', remove: str = None):
         else:
             string_piece += char
     return strings
+
+
+def check_quantity(
+        number: Union[float, int, units.Quantity],
+        unit: units.Unit,
+        allow_mismatch: bool = True,
+        enforce_equivalency: bool = True,
+        convert: bool = False
+):
+    """
+    If the passed number is not a Quantity, turns it into one with the passed unit. If it is already a Quantity,
+    checks the unit; if the unit is compatible with the passed unit, the quantity is returned unchanged (unless convert
+    is True).
+
+    :param number: Quantity (or not) to check.
+    :param unit: Unit to check for.
+    :param allow_mismatch: If `False`, even compatible units will not be allowed.
+    :param enforce_equivalency: If `True`, and if `allow_mismatch` is True, a `units.UnitsError` will be raised if the
+        `number` has units that are not equivalent to `unit`.
+        That is, set this (and `allow_mismatch`) to `True` if you want to ensure `number` has the same
+        dimensionality as `unit`, but not necessarily the same units. Savvy?
+    :param convert: If `True`, convert compatible `Quantity` to units `unit`.
+    :return:
+    """
+    if number is None:
+        return None
+    if not isinstance(number, units.Quantity):  # and number is not None:
+        number *= unit
+    elif number.unit != unit:
+        if not allow_mismatch:
+            raise units.UnitsError(
+                f"This is already a Quantity, but with units {number.unit}; units {unit} were specified.")
+        elif enforce_equivalency and not (number.unit.is_equivalent(unit)):
+            raise units.UnitsError(
+                f"This number is already a Quantity, but with incompatible units ({number.unit}); units {unit} were specified.")
+        elif convert:
+            number = number.to(unit)
+    return number
