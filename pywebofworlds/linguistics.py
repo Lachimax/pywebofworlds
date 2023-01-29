@@ -99,7 +99,9 @@ class LanguageList:
                 families.append(language.family)
             for descendant in language.descendants:
                 descendant = language.descendants[descendant]
-                families = list(set(families + self.list_families_from_node(language=descendant, families=families, rec=rec, max_rec=max_rec)))
+                families = list(
+                    set(families + self.list_families_from_node(language=descendant, families=families, rec=rec,
+                                                                max_rec=max_rec)))
         return families
 
     def show(self):

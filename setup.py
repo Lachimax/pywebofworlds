@@ -13,6 +13,6 @@ setuptools.setup(
     long_description=long_description,
     url="https://github.com/Lachimax/pywebofworlds",
     packages=setuptools.find_packages(),
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     license='Attribution-NonCommercial-ShareAlike 4.0 International'
 )

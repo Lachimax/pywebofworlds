@@ -3,7 +3,6 @@ from typing import List, Union
 import math
 
 import astropy.units as units
-import astropy.io.misc.yaml as yaml
 
 
 # TODO: Standardise handling of CSV files using built in csv reader/writer
@@ -207,25 +206,45 @@ def check_quantity(
     return number
 
 
-def load_params(file: str):
-    file = sanitise_file_ext(file, '.yaml')
+def mkdir_check(*paths: str):
+    """
+    Checks if a directory exists; if not, creates it.
+    :param paths: each argument is a path to check and create.
+    """
+    for path in paths:
+        if not os.path.isdir(path):
+            print(2, f"Making directory {path}")
+            os.mkdir(path)
+        else:
+            print(2, f"Directory {path} already exists, doing nothing.")
 
-    print('Loading parameter file from ' + str(file))
 
-    if os.path.isfile(file):
-        with open(file) as f:
-            p = yaml.load(f)
-    else:
-        p = None
-        print('No parameter file found at', str(file) + ', returning None.')
-    return p
+def mkdir_check_nested(
+        path: str,
+        remove_last: bool = True
+):
+    """
+    Does mkdir_check, but for all parent directories of the given path.
+    That is, for all of the levels of the given path, a directory will be created if it doesn't exist.
+    :param path: path to check and create
+    :param remove_last: If True, does not create the given path itself, only its parent directories.
+        Useful if the path will in fact be that of a file that you just want to create a directory for.
+    :return:
+    """
+    levels = []
+    while len(path) > 1:
+        path, end = os.path.split(path)
+        levels.append(end)
+    levels.append(path)
+    levels.reverse()
+    if remove_last:
+        levels.pop()
+    mkdir_check_args(*levels)
 
 
-def save_params(file: str, dictionary: dict):
-    file = sanitise_file_ext(path=file, ext=".yaml")
-
-    print('Saving parameter file to ' + str(file))
-    print("params.save_params: dictionary ==", dictionary)
-
-    with open(file, 'w') as f:
-        yaml.dump(dictionary, f)
+def mkdir_check_args(*args: str):
+    path = ""
+    for arg in args:
+        path = os.path.join(path, arg)
+        mkdir_check(path)
+    return path

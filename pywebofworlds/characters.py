@@ -1,18 +1,21 @@
 import random as r
-import numpy as np
+import os
 from typing import Union, Iterable, List
 
-import pywebofworlds.timelines as t
+import numpy as np
+
+import pywebofworlds.params as p
+import pywebofworlds.history as t
 import pywebofworlds.utils as u
 import pywebofworlds.biology.species as species
-
+from pywebofworlds import BaseObject
 
 # TODO: Account for mixed ethnicities
 # TODO: Choose and implement sexuality model
 # TODO: gender model
 # TODO: Automatic rebalance of random generation depending on in-use characters.
 # TODO: Allow more flexible distributions of continuous traits - parent class DemographicSet with DiscreteDemoSet and
-#   ContinuousDemoSet as subclasses? Eg for sexuality / gender, on spectra; age
+#   ContinuousDemoSet as subclasses? Eg for sexuality / gender, on spectra; age. Allow to specify distribution type
 # TODO: Allow correlation of demographics - for example, rates of homosexuality and bisexuality differ between males and
 #  females.
 
@@ -20,6 +23,23 @@ import pywebofworlds.biology.species as species
 #   module.
 
 # TODO: Name generator (from list from file)
+
+registry = p.load_registry(obj_type="characters")
+active = {}
+character_dir = p.data_subdir(obj_type="characters", category="characters")
+
+
+def update_registry():
+    return p.update_registry(
+        registry=registry,
+        obj_type="characters",
+        category="characters"
+    )
+
+
+def save_registry():
+    p.save_registry(obj_type="characters", registry=registry)
+
 
 class DemographicSet:
     """An object containing a set of mutually exclusive demographics, ideally adding to 100%. Each set contains one
@@ -126,17 +146,29 @@ class DemographicSet:
 
 
 # Default DemographicSets based on Earth, 2016
-sexes2016 = DemographicSet(trait='Sex',
-                           demographics={'Female': 49.15,
-                                         'Male': 49.15,
-                                         'Intersex': 1.7})
-species2016 = DemographicSet(trait='Species',
-                             demographics={'Human': 100})
-hands2016 = DemographicSet(trait='Hand',
-                           demographics={'Right': 88,
-                                         'Left': 10,
-                                         'Cross': 1,
-                                         'Ambidextrous': 1})
+sexes2016 = DemographicSet(
+    trait='Sex',
+    demographics={
+        'Female': 49.15,
+        'Male': 49.15,
+        'Intersex': 1.7
+    }
+)
+species2016 = DemographicSet(
+    trait='Species',
+    demographics={
+        'Human': 100
+    }
+)
+hands2016 = DemographicSet(
+    trait='Hand',
+    demographics={
+        'Right': 88,
+        'Left': 10,
+        'Cross': 1,
+        'Ambidextrous': 1
+    }
+)
 
 demographics2016 = (sexes2016, hands2016, species2016)
 
@@ -145,18 +177,36 @@ demographics2016 = (sexes2016, hands2016, species2016)
 #   turned into a Demographic object in-method.
 
 
-class Character:
-    def __init__(self, name: str = None):
-        self.name = name
-        self.dob = t.Date()
+class Character(BaseObject):
+    active_dict = active
+    registry_dict = registry
+    path_slug = "characters"
+    category = "characters"
+
+    def __init__(
+            self,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+
+        self.dob: t.Date() = None
+        if "dob" in kwargs:
+            self.dob = t.Date(kwargs["dob"])
+
         # TODO: Account for non-biological parents, eg adoption
-        self.mother = None
-        self.father = None
-        self.children = list()
-        self.traits = {}
-        self.used = False
+        self.mother: Character = None
+        self.father: Character = None
+        self.children: list = []
+        self.traits: dict = {}
+        self.used: bool = False
+
+        self.character_set: CharacterList = None
+        if "character_set" in kwargs:
+            self.character_set = kwargs["character_set"]
 
         self.species: species.Species = None
+        if "species" in kwargs:
+            self.species = species.Species(kwargs["species"])
 
     def __str__(self):
         string = ''
@@ -174,7 +224,7 @@ class Character:
     def __setitem__(self, key: str, value):
         self.traits[key] = value
 
-    def det_dob(self, year, system: str = 'Gregorian', sigma: float = 34.):
+    def gen_dob(self, year, system: str = 'Gregorian', sigma: float = 34.):
         """
         Generate a date-of-birth, assuming the distribution of age is a Gaussian.
         :param year: Year of current setting.
@@ -217,6 +267,9 @@ class Character:
                 population.append(name)
 
         self[trait] = r.choice(population)
+
+    def _generate_id(self, n: int = 0):
+        return f"{self.dob.__str__()}_{self.name}_{n}"
 
 
 class CharacterList:
@@ -297,7 +350,7 @@ class CharacterList:
         :return:
         """
         character = Character()
-        character.det_dob(self.date.year, self.system)
+        character.gen_dob(self.date.year, self.system)
         for trait in self.demographics_list:
             character.trait_from_demographic(demographic_set=self.demographics_list[trait])
         if add:
@@ -328,7 +381,6 @@ class CharacterList:
         :param population:
         :return:
         """
-
 
     def depopulate(self):
         """
