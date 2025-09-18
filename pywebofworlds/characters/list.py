@@ -127,10 +127,11 @@ class CharacterList:
                 self.characters.remove(character)
 
     def repopulate(self, num: int):
-        """
-        Adds num randomly generated Characters to the CharacterList, taking the existing
+        """NOT YET IMPLEMENTED. Adds num randomly generated Characters to the CharacterList, taking the existing
         characters into account.
-        :return:
+
+        Args:
+            num (int): _description_
         """
         # Create an AccountedFor placeholder Demographic that is the fraction occupied by the existing characters?
 
